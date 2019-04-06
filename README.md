@@ -14,6 +14,7 @@ software version/hardware settings.
 - CUDA v10 [nvcc --version], CUDNN v7 [ls /usr/local/cuda/lib64/ | grep cudnn]
 - IP: 35.243.154.118
 
-- Python
-- Tensorflow
--
+And
+- Python 3.5.3
+- Tensorflow 1.13.1
+- numpy 1.16.2
