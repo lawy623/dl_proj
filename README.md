@@ -1,5 +1,5 @@
 # dl_proj
-w4995 deep learning project (Speaker Verification)
+W4995 deep learning project (Speaker Verification)
 
 
 Using Google Cloud for computation.
