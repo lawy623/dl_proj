@@ -4,7 +4,7 @@ W4995 deep learning project (Speaker Verification)
 
 Using Google Cloud for computation.
 To log in the VM, start the vm instance `dl1`, and
-` $ gcloud compute --project "w4995-dl-proj" ssh --zone "us-east1-b" "db1" `
+` $ gcloud compute --project "w4995-dl-proj" ssh --zone "us-east1-b" "dl1" `
 
 software version/hardware settings.
 
