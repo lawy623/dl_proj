@@ -54,19 +54,8 @@ class Model:
             verif_embed = embedded[config.N * config.M:, :]
 
             self.s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, center=enroll_embed)
-
         else:
-            self.enroll = tf.placeholder(shape=[None, None, config.mels], dtype=tf.float32)
-            self.verif = tf.placeholder(shape=[None, None, config.mels], dtype=tf.float32)
-            enroll_size = tf.shape(self.enroll)[1]
-            batch = tf.concat([self.enroll, self.verif], axis=1)
-            embedded = self.build_model(batch)
-            enroll_embed = normalize(embedded[:enroll_size, :])
-            verif_embed = normalize(embedded[enroll_size:, :])
-
-            enroll_center = tf.reduce_mean(enroll_embed, axis=0)
-            verif_center = tf.reduce_mean(verif_embed, axis=0)
-            self.s = tf.reduce_sum(enroll_center * verif_center, axis=0)
+            raise AssertionError("Please check the mode.")
 
         self.saver = tf.train.Saver()
 
