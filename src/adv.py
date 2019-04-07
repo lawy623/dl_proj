@@ -101,20 +101,10 @@ class Buffer:
 
         return batch, sel_speakers
 
-# The global buffer
-buffer = Buffer()
-
-def reset_buffer():
-    """
-    Reset our global buffer.
-    """
-    global buffer
-    buffer = Buffer()
-
-def random_batch(speaker_num=config.N, utter_num=config.M, selected_files=None, frames=None):
-    """
-    Sample from the global buffer.
-    Sample N speakers with M utterances each,
-    from a total K_N speaker with K_M utterances buffer.
-    """
-    return buffer.sample(speaker_num, utter_num, sel_speakers=selected_files, frames=frames)
+    def random_batch(self, speaker_num=config.N, utter_num=config.M, selected_files=None, frames=None):
+        """
+        Sample from the global buffer.
+        Sample N speakers with M utterances each,
+        from a total K_N speaker with K_M utterances buffer.
+        """
+        return self.sample(speaker_num, utter_num, sel_speakers=selected_files, frames=frames)
