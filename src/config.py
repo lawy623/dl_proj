@@ -41,12 +41,12 @@ config_dict = {
     'N': 16,                                                # number of speakers per batch (default 16)
     'M': 7,                                                 # number of utterances per speaker (default 7)
     'lr': 0.01,                                             # initial learning rate
-    'decay': 10000,                                         # num of iterations that lr decay by half
+    'decay': 100000,                                        # num of iterations that lr decay by half
     'optim': ['sgd',                                        # type of the optimizer ('sgd', 'adam', 'rmsprop')
               {'beta1': 0.5, 'beta2': 0.9}],                # additional parameters (for 'adam', 'rmsprop')
-    'nb_iters': 1e5,                                        # max iterations
-    'save_iters': 5000,                                     # iteration of saving checkpoint
-    'show_loss': 20,                                        # iteration to show the loss.
+    'nb_iters': 1e6,                                        # max iterations
+    'save_iters': 10000,                                    # iteration of saving checkpoint
+    'show_loss': 100,                                       # iteration to show the loss.
     'verbose': True,                                        # print training detail
 
     # Debug
