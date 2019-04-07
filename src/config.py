@@ -17,6 +17,7 @@ config_dict = {
     'valid_path': os.path.join(work_dir, 'voxceleb', 'valid'),     # train dataset directory
     'test_path': os.path.join(work_dir, 'voxceleb', 'test'),       # test dataset directory
     'model_path': os.path.join(work_dir, 'model'),                 # model save paths
+    'infer_path': os.path.join(work_dir, 'infer'),                 # TODO: Remove later
 
     # Preprocessing
     'max_ckpts': 6,                                         # max checkpoints to keep. TODO: Any usage here??
