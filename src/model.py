@@ -159,7 +159,7 @@ def cal_eer(s):
                 diff = abs(FAR - FRR)
                 THRES = thres
                 EER = (FAR + FRR) / 2.0
-                EER_FAR = FAT
+                EER_FAR = FAR
                 EER_FRR = FRR
 
         return EER, THRES, EER_FAR, EER_FRR
