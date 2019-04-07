@@ -1,6 +1,8 @@
 from tqdm import tqdm
-
-from utils import *
+import tensorflow as tf
+import numpy as np
+import os
+import librosa
 from config import *
 
 voxceleb_path = os.path.join(data_path, 'voxceleb')
