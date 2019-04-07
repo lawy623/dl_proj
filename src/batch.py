@@ -27,6 +27,5 @@ def get_test_batch(speaker_num = config.N, utter_num = config.M, path = config.t
     utter_batch = utter_batch[:,:,:160]               # for valid/test session, fixed length slicing of input batch
 
     utter_batch = np.transpose(utter_batch, axes=(2,0,1))     # transpose [frames, NM, n_mels]
-
-    print("#################### Utter shape", utter_batch.shape)
+    
     return utter_batch
