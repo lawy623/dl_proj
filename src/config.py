@@ -42,7 +42,7 @@ config_dict = {
               {'beta1': 0.5, 'beta2': 0.9}],                # additional parameters (for 'adam', 'rmsprop')
     'nb_iters': 1e5,                                        # max iterations
     'save_iters': 5000,                                     # iteration of saving checkpoint
-    'show_loss': 10                                         # iteration to show the loss.
+    'show_loss': 10,                                        # iteration to show the loss.
     'verbose': True,                                        # print training detail
 
     # Debug
