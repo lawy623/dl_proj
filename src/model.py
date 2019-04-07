@@ -82,9 +82,7 @@ class Model:
             outputs, _ = tf.nn.dynamic_rnn(cell=lstm, inputs=batch, dtype=tf.float32, time_major=True)
             embedded = outputs[-1]
 
-            # shape = (N * M, nb_proj)
-            embedded = tf.reduce_mean(embedded, axis=1)
-            # shape = (N * M)
+            # shape = (N * M, nb_proj). Each e_ji is in (nb_proj,) dimension.
             embedded = normalize(embedded)
         return embedded
 
