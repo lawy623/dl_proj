@@ -16,7 +16,7 @@ class Buffer:
         self.flush_thres = flush_thres
         self.K_N = config.K1 * config.N
         self.K_M = config.K2 * config.M
-        self.count_down = int( ((self.K_N/config.N) * (self.K_M/config.M)) * flush_thres )
+        self.count_down = int( ((self.K_N/config.N) * (self.K_M/config.M)) * self.flush_thres )
         self.counter = 0
         if config.debug:
             print("Flushing frequence: ", self.count_down)
@@ -39,7 +39,7 @@ class Buffer:
         Return: whether to flush the buffer
         """
         self.K_N = min(self.K_N, len(npy_list)) # If no much data, we load them all.
-        self.count_down = int(((self.K_N/config.N) * (self.K_M/config.M)) * flush_thres)
+        self.count_down = int( ((self.K_N/config.N) * (self.K_M/config.M)) * self.flush_thres )
         self.counter = 0
         if config.debug:
             print("Flushing frequence: ", self.count_down)
