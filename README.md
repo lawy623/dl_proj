@@ -9,6 +9,7 @@ To log in the VM, start the vm instance `dl1`, and
 ` $ gcloud compute --project "w4995-dl-proj" ssh --zone "us-east1-b" "dl1" `
 
 File Transferring:
+
 `$ gcloud compute scp [LOCAL_FILE_PATH] [INSTANCE_NAME]:~`
 
 `$ gcloud compute scp --recurse [INSTANCE_NAME]:[REMOTE_DIR] [LOCAL_DIR]`
@@ -31,9 +32,10 @@ And
 - Python 3.5.3
 - Tensorflow 1.13.1
 - numpy 1.16.2
+- librosa 0.6.3
 
 
-### Installation
+### Preparation
 1. Get the code.
    ```Shell
    git clone https://github.com/lawy623/dl_proj.git
