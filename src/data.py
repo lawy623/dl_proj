@@ -13,7 +13,9 @@ utter_min_len = (config.max_frames * config.hop + config.window) * config.sr
 
 def wav2spectro(utter_path):
     """
-    Process a wav(utter_path) into a
+    Process a wav(utter_path) into a utter specturgram.
+    Param: path of the wav file
+    Return: a specturgram file of size (n_mel, max_frame)
     """
     utterances_spec = []
     utter, sr = librosa.core.load(utter_path, config.sr)  ## Load the path into real utter file.
@@ -35,14 +37,14 @@ def wav2spectro(utter_path):
 def save_spectrogram(speakers, train_path, valid_path, test_path, test_split, valid_split):
     """
     Save the speaker files in to preprocessed .npy files.
-    :param speakers: [speaker_1, speaker_2, ..., speaker_n] -> each speaker:[utter_1, utter_2, ..., utter_m](these are paths)
-    :param train_path: Save preprocessed train file location.
-    :param test_path:  Save preprocessed train file location.
-    :param test_path:  Save preprocessed train file location.
-    :param test_split: ratio of test
-    :param valid_split: ratio of valid
+    Param speakers: [speaker_1, speaker_2, ..., speaker_n] -> each speaker:[utter_1, utter_2, ..., utter_m](these are paths)
+    Param train_path: Save preprocessed train file location.
+    Param valid_path:  Save preprocessed valid file location.
+    Param test_path:  Save preprocessed test file location.
+    Param test_split: ratio of test
+    Param valid_split: ratio of valid
 
-    Return: Each speaker obtain a .npy file of size (n, 40, 180). n is different from the person.
+    Return: Each speaker obtain a .npy file of size (n_utter, n_mel, max_frame). n is different among the spearker.
     """
     print("Train writes to: ", train_path)
     print("Valid writes to: ", valid_path)

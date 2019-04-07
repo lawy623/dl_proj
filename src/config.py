@@ -1,4 +1,3 @@
-__author__ = 'Bingqing Wei'
 import os
 
 work_dir = '/home/lawy623/dl_proj' # Work from where. Default runs at 'src/..''
@@ -8,7 +7,7 @@ class Config: pass
 
 """
 during execution:
-modifying anything other than the config.mode is not recommended
+modifying anything other than the config.mode, config.model_path is not recommended
 """
 
 config_dict = {
@@ -17,10 +16,8 @@ config_dict = {
     'valid_path': os.path.join(work_dir, 'voxceleb', 'valid'),     # train dataset directory
     'test_path': os.path.join(work_dir, 'voxceleb', 'test'),       # test dataset directory
     'model_path': os.path.join(work_dir, 'model'),                 # model save paths
-    'infer_path': os.path.join(work_dir, 'infer'),                 # TODO: Remove later
 
     # Preprocessing
-    'max_ckpts': 6,                                         # max checkpoints to keep. TODO: Any usage here??
     'sr': 16000,                                            # sample rate
     'nfft': 512,                                            # fft kernel size
     'window': 0.025,                                        # window length (ms)
@@ -29,7 +26,7 @@ config_dict = {
     'min_frames': 140,                                      # number of min frames
     'mels':40,                                              # number of mel banks. That will be the first dim of the np file.
 
-    # Model
+    # Model. For LSTM model here.
     'nb_hidden': 384,                                       # number of hidden units
     'nb_proj': 128,                                         # number of projection units
     'nb_layers': 3,                                         # number of LSTM_Projection layers
@@ -39,11 +36,13 @@ config_dict = {
     'mode': 'train',                                        # train or test
     'N': 16,                                                # number of speakers per batch
     'M': 7,                                                 # number of utterances per speaker
-    'lr': 0.01,
+    'lr': 0.01,                                             # initial learning rate
+    'decay': 10000,                                         # num of iterations that lr decay by half
     'optim': ['sgd',                                        # type of the optimizer ('sgd', 'adam', 'rmsprop')
               {'beta1': 0.5, 'beta2': 0.9}],                # additional parameters (for 'adam', 'rmsprop')
     'nb_iters': 1e5,                                        # max iterations
-    'verbose': True,
+    'save_iters': 5000,                                     # iteration of saving checkpoint
+    'verbose': True,                                        # print training detail
 
     # Debug
     'debug': True,                                          # turn on debug info output
