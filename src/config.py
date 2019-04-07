@@ -27,7 +27,7 @@ config_dict = {
     'hop': 0.01,                                            # hop size (ms)
     'max_frames': 180,                                      # number of max frames
     'min_frames': 140,                                      # number of min frames
-    'mels':40,                                              # number of mel banks
+    'mels':40,                                              # number of mel banks. That will be the first dim of the np file.
 
     # Model
     'nb_hidden': 384,                                       # number of hidden units

@@ -73,11 +73,9 @@ def save_spectrogram(speakers, train_path, valid_path, test_path, test_split, va
 
     for i, idx in enumerate(tqdm(permu)):
         files = speakers[idx]
-        print(idx)
         utterances_spec = []
         for utter_path in files: # Make each wav file into a spec file.
             utterances_spec.extend(wav2spectro(utter_path))
-        print("len is {}".format(len(utterances_spec)))
 
         if i < train_speaker_num:
             np.save(os.path.join(train_path, 'speaker_{}.npy'.format(i)), utterances_spec)
