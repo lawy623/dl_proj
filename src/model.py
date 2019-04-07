@@ -56,10 +56,6 @@ class Model:
                 tf.reshape(embedded[:config.N * config.M, :], shape=[config.N, config.M, -1]), axis=1))
             verif_embed = embedded[config.N * config.M:, :]
 
-            print("#################### Embedded shape", embedded.shape)
-            print("#################### Enroll shape", enroll_embed.shape)
-            print("#################### Verif shape", verif_embed.shape)
-
             self.s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, center=enroll_embed) # Shape??
 
             if config.verbose:
@@ -130,8 +126,6 @@ class Model:
         enroll_batch = get_test_batch()
         verif_batch = get_test_batch(utter_start = config.M)
         test_batch = np.concatenate(enroll_batch, verif_batch, axis=1)
-
-        print("#################### test shape", utter_batch.shape)
 
         s = sess.run(self.s_mat, feed_dict={self.batch: test_batch})
         s = s.reshape([config.N, config.M, -1])
