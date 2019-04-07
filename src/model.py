@@ -13,7 +13,7 @@ class Model:
         Basic Model Structure.
         """
         if config.mode == 'train':
-            buffer = Buffer() # Set a global buffer.
+            self.buffer = Buffer() # Set a global buffer.
             self.batch = tf.placeholder(shape=[None, config.N * config.M, config.mels], dtype=tf.float32) # First dim is for n_frame
             w = tf.get_variable('w', initializer=np.array([10], dtype=np.float32))
             b = tf.get_variable('b', initializer=np.array([-5], dtype=np.float32))
@@ -97,7 +97,7 @@ class Model:
         lr_factor = 1  ## Decay by half every xx iteration
         loss_acc = 0   ## accumulate loss in every xx iteration
         for i in range(int(config.nb_iters)):
-            batch, _ = random_batch()
+            batch, _ = self.buffer.random_batch()
             _, loss_cur, summary = sess.run([self.train_op, self.loss, self.merged],
                                             feed_dict={self.batch: batch,
                                                        self.lr: config.lr * lr_factor})
