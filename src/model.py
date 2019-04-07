@@ -125,7 +125,7 @@ class Model:
 
         enroll_batch = get_test_batch()
         verif_batch = get_test_batch(utter_start = config.M)
-        test_batch = np.concatenate(enroll_batch, verif_batch, axis=1)
+        test_batch = np.concatenate((enroll_batch, verif_batch), axis=1)
 
         s = sess.run(self.s_mat, feed_dict={self.batch: test_batch})
         s = s.reshape([config.N, config.M, -1])

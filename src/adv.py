@@ -12,10 +12,8 @@ class Buffer:
         Param flush_thres: should be greater than 1
         """
         if not config.mode == 'train':
-            print("It is now testing session")
             return
 
-        print("test running")
         self.flush_thres = flush_thres
         self.K_N = config.K1 * config.N
         self.K_M = config.K2 * config.M
