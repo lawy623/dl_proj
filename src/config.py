@@ -40,8 +40,8 @@ config_dict = {
     'N': 16,                                                # number of speakers per batch
     'M': 7,                                                 # number of utterances per speaker
     'lr': 0.01,
-    'optim': ['sgd',                                        # type of the optimizer
-              {'beta1': 0.5, 'beta2': 0.9}],    # additional parameters
+    'optim': ['sgd',                                        # type of the optimizer ('sgd', 'adam', 'rmsprop')
+              {'beta1': 0.5, 'beta2': 0.9}],                # additional parameters (for 'adam', 'rmsprop')
     'nb_iters': 1e5,                                        # max iterations
     'verbose': True,
 

@@ -3,6 +3,16 @@ import os
 import shutil
 from model import *
 from config import *
+import argparse
+
+# Reading args from user input
+parser = argparse.ArgumentParser()
+parser.add_argument('--mode', type=str, default='train', help="model type(train/test/infer)")
+parser.add_argument('--model_path', type=str, default=config.model_path, help="model path")
+args = parser.parse_args()
+
+config.mode = args.mode
+config.model_path = args.model_path
 
 if __name__ == "__main__":
     tf.reset_default_graph()

@@ -7,6 +7,9 @@ from config import *
 
 class Model:
     def __init__(self):
+        """
+        Basic Model Structure.
+        """
         if config.mode == 'train':
             self.batch = tf.placeholder(shape=[None, config.N * config.M, config.mels], dtype=tf.float32)
             w = tf.get_variable('w', initializer=np.array([10], dtype=np.float32))
@@ -14,20 +17,18 @@ class Model:
             self.lr = tf.placeholder(dtype=tf.float32)
             global_step = tf.Variable(0, name='global_step', trainable=False)
 
-            embedded = self.build_model(self.batch)
+            embedded = self.build_model(self.batch) # Get the embedding representation.
             s_mat = similarity(embedded, w, b)
-
             if config.verbose:
                 print('embedded size: ', embedded.shape)
                 print('similarity matrix size: ', s_mat.shape)
             self.loss = loss_cal(s_mat, name=config.loss)
 
+            # optimization
             trainable_vars = tf.trainable_variables()
             optimizer = optim(self.lr)
-
             grads, params = zip(*optimizer.compute_gradients(self.loss))
             grads_clip, _ = tf.clip_by_global_norm(grads, 3.0)
-
             # 0.01 gradient scale for w and b, 0.5 gradient scale for projection nodes
             grads_rescale = [0.01 * g for g in grads_clip[:2]]
             for g, p in zip(grads_clip[2:], params[2:]):
@@ -35,8 +36,8 @@ class Model:
                     grads_rescale.append(0.5 * g)
                 else:
                     grads_rescale.append(g)
-
             self.train_op = optimizer.apply_gradients(zip(grads_rescale, params), global_step=global_step)
+
 
             variable_count = np.sum(np.array([np.prod(np.array(v.get_shape().as_list())) for v in trainable_vars]))
             if config.verbose: print('total variables:', variable_count)
@@ -70,6 +71,10 @@ class Model:
         self.saver = tf.train.Saver()
 
     def build_model(self, batch):
+        """
+        Deep learning model to extract the embedding and get the matrix.
+        Model1: LSTM
+        """
         with tf.variable_scope('lstm'):
             cells = [tf.contrib.rnn.LSTMCell(num_units=config.nb_hidden, num_proj=config.nb_proj)
                      for i in range(config.nb_layers)]
@@ -78,6 +83,8 @@ class Model:
             embedded = outputs[-1]
 
             # shape = (N * M, nb_proj)
+            embedded = tf.reduce_mean(embedded, axis=1)
+            # shape = (N * M)
             embedded = normalize(embedded)
         return embedded
 
@@ -174,16 +181,3 @@ class Model:
 
         EER = np.mean(EERS)
         print('(test) EER: {}'.format(EER))
-
-
-    def infer(self, sess, path, thres=0.57):
-        self.saver.restore(sess, path)
-        enrolls, verifs = gen_infer_batches()
-        s = sess.run(self.s, feed_dict={
-            self.enroll: enrolls,
-            self.verif: verifs
-        })
-        if s > thres:
-            print('same speaker')
-        else:
-            print('different speakers')
