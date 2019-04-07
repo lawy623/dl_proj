@@ -6,23 +6,19 @@ import gc
 from config import *
 from data import wav2spectro
 
-infer_enroll_path = os.path.join(config.infer_path, 'enroll')
-infer_verif_path = os.path.join(config.infer_path, 'verif')
-
 class Buffer:
-    def __init__(self, K_N=(10 * config.N), K_M=(2 * config.M), flush_thres=1.5):
+    def __init__(self, flush_thres=1.5):
         """
-        :param K_N:
-        :param K_M:
-        :param flush_thres: should be greater than 1
+        Param flush_thres: should be greater than 1
         """
         if not config.mode == 'train': flush_thres = 0.2
 
         self.flush_thres = flush_thres
-        self.count_down = int(math.sqrt(K_N * K_M * flush_thres))
+        self.K_N = config.K1 * config.N
+        self.K_M = config.K2 * config.M
+        self.count_down = int(math.sqrt(self.K_N * self.K_M * flush_thres))
         self.counter = 0
-        self.K_N = K_N
-        self.K_M = K_M
+
         if config.mode == 'train':
             self.data_path = os.path.join(config.train_path)
         else:
@@ -32,8 +28,9 @@ class Buffer:
 
     def update(self, npy_list):
         """
-        :param npy_list:
-        :return: whether to flush the buffer
+        Update the list to load in Memory.
+        Param npy_list: list of .npy files that are in the corresponding dir.
+        Return: whether to flush the buffer
         """
         self.K_N = min(self.K_N, len(npy_list))
         self.count_down = int(math.sqrt(self.K_N * self.K_M * self.flush_thres))
@@ -86,27 +83,18 @@ class Buffer:
 
         return batch, sel_speakers
 
+# The global buffer
 buffer = Buffer()
 
 def reset_buffer():
+    """
+    reset our global buffer
+    """
     global buffer
     buffer = Buffer()
 
 def random_batch(speaker_num=config.N, utter_num=config.M, selected_files=None, frames=None):
+    """
+    Sample from the global buffer.
+    """
     return buffer.sample(speaker_num, utter_num, sel_speakers=selected_files, frames=frames)
-
-def gen_infer_batches():
-    """
-    :return: enrolls, verifs
-    """
-
-    enroll_utters = []
-    verif_utters = []
-    for file in os.listdir(infer_enroll_path):
-        enroll_utters.extend(wav2spectro(os.path.join(infer_enroll_path, file)))
-    for file in os.listdir(infer_verif_path):
-        verif_utters.extend(wav2spectro(os.path.join(infer_verif_path, file)))
-
-    enroll_utters = np.transpose(np.array(enroll_utters), axes=(2, 0, 1))
-    verif_utters = np.transpose(np.array(verif_utters), axes=(2, 0, 1))
-    return enroll_utters, verif_utters

@@ -8,6 +8,7 @@ from config import *
 def random_batch(speaker_num = config.N, utter_num = config.M, path = config.train_path, shuffle = True, utter_start = 0):
     """
     Get the batch from desired path.
+    No use in this proj. Too much I/O. Just for reference.
     """
     np_file_list = os.listdir(path)
     total_speaker = len(np_file_list)

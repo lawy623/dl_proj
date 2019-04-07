@@ -58,7 +58,7 @@ class Model:
 
             if config.verbose:
                 print('Embedded size: ', embedded.shape)
-                print('Similarity matrix size: ', s_mat.shape)
+                print('Similarity matrix size: ', self.s_mat.shape)
         else:
             raise AssertionError("Please check the mode.")
 
@@ -117,7 +117,6 @@ class Model:
                 if config.verbose: print('model is saved!')
 
     def test(self, sess, path, nb_batch_thres=5, nb_batch_test=100):
-        return ## TODO: Remain to be build
         assert config.mode == 'test'
         def cal_ff(s, thres):
             s_thres = s > thres
@@ -128,12 +127,14 @@ class Model:
             return far, frr
 
         def gen_batch():
-            enroll_batch, selected_files = random_batch()
-            verif_batch, _ = random_batch()
+            enroll_batch, selected_files = random_batch(frames=160)
+            verif_batch, _ = random_batch(selected_files=selected_files, frames=160)
             return np.concatenate([enroll_batch, verif_batch], axis=1)
 
         self.saver.restore(sess, path)
 
+        config.train = True
+        reset_buffer()
         s_mats = []
         for i in range(nb_batch_thres):
             s = sess.run(self.s_mat, feed_dict={self.batch: gen_batch()})
@@ -161,6 +162,7 @@ class Model:
         print('(validation) thres: {}, EER: {}'.format(THRES, EER))
 
         config.train = False
+        reset_buffer()
         EERS = []
         for i in range(nb_batch_test):
             s = sess.run(self.s_mat, feed_dict={self.batch: gen_batch()})
