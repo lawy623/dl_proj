@@ -26,7 +26,6 @@ def wav2spectro(utter_path):
             S = np.abs(S) ** 2
             mel_basis = librosa.filters.mel(sr=config.sr, n_fft=config.nfft, n_mels=config.mels)
             S = np.log10(np.dot(mel_basis, S) + 1e-6)
-            print(S.shape)
 
             if config.mode != 'infer':
                 '''
@@ -69,11 +68,11 @@ def save_spectrogram(speakers, train_path, valid_path, test_path, test_split, va
     print('Train : {}| Valid : {}| Test : {}'.format(train_speaker_num, valid_speaker_num, test_speaker_num))
 
     # Do some random permutation.
-    permu = np.random.permutation(len(speaker))
+    permu = np.random.permutation(len(speakers))
     np.save(os.path.join(work_dir, 'permute.npy'), permu)
 
     for i, idx in enumerate(tqdm(permu)):
-        files = speaker[idx]
+        files = speakers[idx]
         print(idx)
         utterances_spec = []
         for utter_path in files: # Make each wav file into a spec file.
