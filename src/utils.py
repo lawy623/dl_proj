@@ -31,14 +31,14 @@ def similarity(embedded, w, b, N=config.N, M=config.M, center=None):
         print(center_except.shape)
         # shape = (N * M, N)
         S = tf.concat(
-            [tf.concat([cossim(center_except[i * M:(i + 1) * M] * embedded_split[j, :]) if i == j
+            [tf.concat([cossim(center_except[i * M:(i + 1) * M], embedded_split[j, :]) if i == j
                         else cossim(center[i:(i + 1)] * embedded_split[j, :]) for i in range(N)], axis=1) for j in range(N)], axis=0)
         print(S.shape)
     else:
         # center[i] * embedded_slit[j, :] is element-wise multiplication
         # therefore it needs to use reduce_sum to get vectors dot product
         S = tf.concat([
-            tf.concat(cossim(center[i] * embedded_split[j, :]) for i in range(N)], axis=1) for j in range(N)], axis=0)
+            tf.concat([cossim(center[i], embedded_split[j, :]) for i in range(N)], axis=1) for j in range(N)], axis=0)
 
     # shape = (N * M, N)
     S = tf.abs(w) * S + b
