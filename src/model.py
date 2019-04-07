@@ -4,7 +4,7 @@ import os
 import math
 from utils import *
 from config import *
-from batch import *
+from adv import *
 
 class Model:
     def __init__(self):
@@ -50,9 +50,9 @@ class Model:
             self.batch = tf.placeholder(shape=[None, config.N * config.M * 2, config.mels], dtype=tf.float32)
             embedded = self.build_model(self.batch) # [2NM, nb_proj]
             # concatenate [enroll, verif]
-            enroll_embed = tf.reduce_mean(
+            enroll_embed = normalize(tf.reduce_mean(
                 tf.reshape(embedded[:config.N * config.M, :], shape=[config.N, config.M, -1]), axis=1)
-            verif_embed = embedded[config.N * config.M:, :]
+            verif_embed = embedded[config.N * config.M:, :])
 
             self.s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, center=enroll_embed)
 
@@ -95,7 +95,7 @@ class Model:
         lr_factor = 1  ## Decay by half every xx iteration
         loss_acc = 0   ## accumulate loss in every xx iteration
         for i in range(int(config.nb_iters)):
-            batch = random_batch()
+            batch, _ = random_batch()
             _, loss_cur, summary = sess.run([self.train_op, self.loss, self.merged],
                                             feed_dict={self.batch: batch,
                                                        self.lr: config.lr * lr_factor})
@@ -104,7 +104,7 @@ class Model:
             if i % 10 == 0: # write to tensorboard
                 writer.add_summary(summary, i)
 
-            if (i + 1) % 10 == 0: # print acc loss
+            if (i + 1) % config.show_loss == 0: # print acc loss
                 if config.verbose: print('(iter : %d) loss: %.4f' % ((i + 1), loss_acc / 100))
                 loss_acc = 0
 

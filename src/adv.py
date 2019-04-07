@@ -24,9 +24,9 @@ class Buffer:
         self.K_N = K_N
         self.K_M = K_M
         if config.mode == 'train':
-            self.data_path = os.path.join(config.train_path)
+            self.data_path = os.path.join(config.train_path, config.dataset)
         else:
-            self.data_path = os.path.join(config.train_path)
+            self.data_path = os.path.join(config.train_path, config.dataset)
         self.buffer = None
         self.flush()
 
