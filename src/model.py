@@ -134,7 +134,7 @@ class Model:
 
         print("\nEER : %0.2f (thres:%0.2f, FAR:%0.2f, FRR:%0.2f)"%(EER,THRES,EER_FAR,EER_FRR))
 
-    def cal_ff(s, thres):
+def cal_ff(s, thres):
         """
         Cal FAR and FRR
         """
@@ -145,7 +145,7 @@ class Model:
         frr = sum([config.M - np.sum(s_thres[i][:, i]) for i in range(config.N)]) / config.M / config.N
         return far, frr
 
-    def cal_eer(s):
+def cal_eer(s):
         """
         Calculate EER.
         """
