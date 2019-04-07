@@ -33,7 +33,7 @@ config_dict = {
     'loss':'softmax',                                       # loss function to use. 'softmax' or 'contrast'
 
     # Data Buffer. Change based on memory
-    'K1': 50,                                               # times of N that buffer reads in
+    'K1': 20,                                               # times of N that buffer reads in
     'K2': 5,                                                # times of M that buffer reads in
 
     # Session
