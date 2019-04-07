@@ -51,8 +51,8 @@ class Model:
             embedded = self.build_model(self.batch) # [2NM, nb_proj]
             # concatenate [enroll, verif]
             enroll_embed = normalize(tf.reduce_mean(
-                tf.reshape(embedded[:config.N * config.M, :], shape=[config.N, config.M, -1]), axis=1)
-            verif_embed = embedded[config.N * config.M:, :])
+                tf.reshape(embedded[:config.N * config.M, :], shape=[config.N, config.M, -1]), axis=1))
+            verif_embed = embedded[config.N * config.M:, :]
 
             self.s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, center=enroll_embed)
 
