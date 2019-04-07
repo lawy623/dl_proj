@@ -27,16 +27,9 @@ def wav2spectro(utter_path):
             mel_basis = librosa.filters.mel(sr=config.sr, n_fft=config.nfft, n_mels=config.mels)
             S = np.log10(np.dot(mel_basis, S) + 1e-6)
 
-            if config.mode != 'infer':
-                '''
-                NOTE: each interval in utterance only extracts 2 samples
-                '''
-                utterances_spec.append(S[:, :config.max_frames])
-                utterances_spec.append(S[:, -config.max_frames:])
-            else:
-                max_steps = int((S.shape[1] - avg_frames) / hop_frames) + 1
-                for i in range(max_steps):
-                    utterances_spec.append(S[:, hop_frames * i : hop_frames * i + avg_frames])
+            max_steps = int((S.shape[1] - avg_frames) / hop_frames) + 1
+            for i in range(max_steps):
+                utterances_spec.append(S[:, hop_frames * i : hop_frames * i + avg_frames])
     return utterances_spec
 
 def save_spectrogram(speakers, train_path, valid_path, test_path, test_split, valid_split):

@@ -4,7 +4,6 @@ import librosa
 import random
 import os
 from config import *
-from adv import *
 
 def normalize(x):
     return x / tf.sqrt(tf.reduce_sum(x ** 2, axis=-1, keepdims=True) + 1e-6)

@@ -7,8 +7,9 @@ import argparse
 
 # Reading args from user input
 parser = argparse.ArgumentParser()
-parser.add_argument('--mode', type=str, default='train', help="model type(train/test/infer)")
+parser.add_argument('--mode', type=str, default='train', help="model type(train/test)")
 parser.add_argument('--model_path', type=str, default=config.model_path, help="model path")
+parser.add_argument('--iter', type=str, default=0, help="model checkpoint id")
 args = parser.parse_args()
 
 config.mode = args.mode
@@ -20,14 +21,17 @@ if __name__ == "__main__":
     model = Model()
     if config.mode == 'train':
         print("\nTraining Session")
+        if os.path.exists(config.model_path):
+            shutil.rmtree(config.model_path)
         os.makedirs(config.model_path)
         model.train(sess, config.model_path)
     elif config.mode == 'test':
         print("\nTest Session")
+        iter = args.iter
+        model_name = 'model.ckpt-' + iter
         if os.path.isdir(config.model_path):
-            model.test(sess, os.path.join(config.model_path, 'check_point', 'model.ckpt-0'))
+            model.test(sess, os.path.join(config.model_path, 'check_point', model_name))
         else:
             raise AssertionError("model path doesn't exist!")
     else:
-        print("\nInfer Session")
-        model.infer(sess, path=os.path.join(config.model_path, 'check_point', 'model.ckpt-0'), thres=0.57)
+        raise AssertionError("model path doesn't exist!")
