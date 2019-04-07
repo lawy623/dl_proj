@@ -16,7 +16,6 @@ config.mode = args.mode
 config.model_path = args.model_path
 
 if __name__ == "__main__":
-    print("Mode ", config.mode)
     tf.reset_default_graph()
     sess = tf.Session()
     model = Model()
