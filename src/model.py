@@ -99,13 +99,13 @@ class Model:
             _, loss_cur, summary = sess.run([self.train_op, self.loss, self.merged],
                                             feed_dict={self.batch: batch,
                                                        self.lr: config.lr * lr_factor})
-            loss_acc += loss_cur
+            loss_acc += loss_cur / (config.N * config.M) * 100 ## Norm the loss by dimension.
 
             if i % 10 == 0: # write to tensorboard
                 writer.add_summary(summary, i)
 
             if (i + 1) % config.show_loss == 0: # print acc loss
-                if config.verbose: print('(iter : %d) loss: %.4f' % ((i + 1), loss_acc / 100))
+                if config.verbose: print('(iter : %d) loss: %.4f' % ((i + 1), loss_acc / config.show_loss))
                 loss_acc = 0
 
             if (i + 1) % config.decay == 0:  # decay lr by half.
