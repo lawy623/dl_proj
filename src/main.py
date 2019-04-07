@@ -19,6 +19,7 @@ if __name__ == "__main__":
     tf.reset_default_graph()
     sess = tf.Session()
     model = Model()
+    print("Mode ", config.mode)
     if config.mode == 'train':
         print("\nTraining Session")
         if os.path.exists(config.model_path):
