@@ -57,7 +57,7 @@ def save_spectrogram(speakers, train_path, valid_path, test_path, test_split, va
 
     total_speaker_num = len(speakers)
 
-    test_speaker_num = int(total_speaker_num * test_split))
+    test_speaker_num = int(total_speaker_num * test_split)
     valid_speaker_num = int(total_speaker_num * valid_split)
     train_speaker_num = int(total_speaker_num - test_speaker_num - valid_speaker_num)
 
@@ -68,7 +68,7 @@ def save_spectrogram(speakers, train_path, valid_path, test_path, test_split, va
 
     # Do some random permutation.
     permu = np.random.permutation(len(speaker))
-    np.save(os.path.join(work_dir, 'permute.npy')), permu)
+    np.save(os.path.join(work_dir, 'permute.npy'), permu)
 
     for i, idx in enumerate(tqdm(permu)):
         files = speaker[idx]
@@ -76,7 +76,7 @@ def save_spectrogram(speakers, train_path, valid_path, test_path, test_split, va
         utterances_spec = []
         for utter_path in files: # Make each wav file into a spec file.
             utterances_spec.extend(wav2spectro(utter_path))
-        print("len is {}".format(len(utterances_spec))
+        print("len is {}".format(len(utterances_spec)))
 
         if i < train_speaker_num:
             np.save(os.path.join(train_path, 'speaker_{}.npy'.format(i)), utterances_spec)
