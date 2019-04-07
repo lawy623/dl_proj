@@ -18,8 +18,6 @@ class Buffer:
         self.K_M = config.K2 * config.M
         self.count_down = int( ((self.K_N/config.N) * (self.K_M/config.M)) * self.flush_thres )
         self.counter = 0
-        if config.debug:
-            print("Flushing frequence: ", self.count_down)
 
         if config.mode == 'train':
             self.data_path = os.path.join(config.train_path)
