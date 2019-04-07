@@ -49,9 +49,9 @@ def save_spectrogram(speakers, train_path, valid_path, test_path, test_split, va
     :param test_split: ratio of test
     :param valid_split: ratio of valid
     """
-    print("Train writes to: %s", train_path)
-    print("Valid writes to: %s", valid_path)
-    print("Test writes to: %s", test_path)
+    print("Train writes to: ", train_path)
+    print("Valid writes to: ", valid_path)
+    print("Test writes to: ", test_path)
     os.makedirs(train_path, exist_ok=True)
     os.makedirs(valid_path, exist_ok=True)
     os.makedirs(test_path, exist_ok=True)

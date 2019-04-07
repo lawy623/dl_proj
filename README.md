@@ -44,3 +44,8 @@ And
 
  2. Download the raw dataset. We use [Voxceleb1](http://www.robots.ox.ac.uk/~vgg/data/voxceleb/vox1.html) for this project.
  Go into `./raw_data` and run `$sh get_data_voxceleb.sh`. We only use the training dataset and separate it for our testing. It is about 37GB large.
+
+ ### Data Preprocess
+ 1. Run `python src/data.py` for data preprocessing.
+
+ Some statistics: 1211 speakers. 0.8/0.1/0.1 -> [Train(969)/ Valid(121)/ Test(121)]. Min(nb_utter)=45. Max(nb_utter)=1002.
