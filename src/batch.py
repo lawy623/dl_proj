@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 import os
 import math
-
+from config import *
 
 def random_batch(speaker_num = config.N, utter_num = config.M, path = config.train_path, shuffle = True, utter_start = 0):
     """
