@@ -27,7 +27,7 @@ if __name__ == "__main__":
         model.train(sess)
     elif config.mode == 'test':
         print("\nTest Session")
-        model_name = 'model.ckpt-' + args.iter
+        model_name = 'model.ckpt-' + str(args.iter)
         if os.path.isdir(config.model_path):
             model.test(sess, os.path.join(config.model_path, 'check_point', model_name))
         else:
