@@ -95,7 +95,7 @@ class Model:
         lr_factor = 1  ## Decay by half every xx iteration
         loss_acc = 0   ## accumulate loss in every xx iteration
         for i in range(int(config.nb_iters)):
-            batch, _ = random_batch()
+            batch = random_batch()
             _, loss_cur, summary = sess.run([self.train_op, self.loss, self.merged],
                                             feed_dict={self.batch: batch,
                                                        self.lr: config.lr * lr_factor})
