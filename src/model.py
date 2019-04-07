@@ -49,7 +49,7 @@ class Model:
             self.merged = tf.summary.merge_all()
 
         elif config.mode == 'test':
-            self.batch = tf.placeholder(shape=[None, config.N * config.M, config.mels], dtype=tf.float32)
+            self.batch = tf.placeholder(shape=[None, config.N * config.M * 2, config.mels], dtype=tf.float32)
             embedded = self.build_model(self.batch) # [2NM, nb_proj]
             # concatenate [enroll, verif]
             enroll_embed = normalize(tf.reduce_mean(
