@@ -48,6 +48,8 @@ def save_spectrogram(speakers, train_path, valid_path, test_path, test_split, va
     :param test_path:  Save preprocessed train file location.
     :param test_split: ratio of test
     :param valid_split: ratio of valid
+
+    Return: Each speaker obtain a .npy file of size (n, 40, 180). n is different from the person.
     """
     print("Train writes to: ", train_path)
     print("Valid writes to: ", valid_path)
