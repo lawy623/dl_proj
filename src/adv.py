@@ -11,7 +11,7 @@ class Buffer:
         """
         Param flush_thres: should be greater than 1
         """
-        if not config.mode == 'train': flush_thres = 0.2
+        if not config.mode == 'train': return
 
         self.flush_thres = flush_thres
         self.K_N = config.K1 * config.N
@@ -91,8 +91,7 @@ class Buffer:
 
         # shape = (frames, N * M, n_mel)
         batch = np.transpose(batch, axes=(2, 0, 1))
-        if config.debug:
-            print("Batch shape: ", batch.shape)
+
         self.counter += 1
         if self.counter >= self.count_down:
             self.flush()
@@ -104,7 +103,7 @@ buffer = Buffer()
 
 def reset_buffer():
     """
-    Reset our global buffer
+    Reset our global buffer.
     """
     global buffer
     buffer = Buffer()

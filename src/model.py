@@ -5,6 +5,7 @@ import math
 from utils import *
 from config import *
 from adv import *
+from batch import *
 
 class Model:
     def __init__(self):
@@ -47,17 +48,17 @@ class Model:
             self.merged = tf.summary.merge_all()
 
         elif config.mode == 'test':
-            self.batch = tf.placeholder(shape=[None, config.N * config.M * 2, config.mels], dtype=tf.float32)
+            self.batch = tf.placeholder(shape=[None, config.N * config.M, config.mels], dtype=tf.float32)
             embedded = self.build_model(self.batch) # [2NM, nb_proj]
             # concatenate [enroll, verif]
             enroll_embed = normalize(tf.reduce_mean(
                 tf.reshape(embedded[:config.N * config.M, :], shape=[config.N, config.M, -1]), axis=1))
             verif_embed = embedded[config.N * config.M:, :]
 
-            self.s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, center=enroll_embed)
+            self.s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, center=enroll_embed) # Shape??
 
             if config.verbose:
-                print('Embedded size: ', embedded.shape)
+                print('Embedded size: ', embedded.shape) # [NM, P]
                 print('Similarity matrix size: ', self.s_mat.shape)
         else:
             raise AssertionError("Please check the mode.")
@@ -116,60 +117,48 @@ class Model:
                 self.saver.save(sess, os.path.join(model_path, 'model.ckpt'), global_step=i // config.save_iters)
                 if config.verbose: print('model is saved!')
 
-    def test(self, sess, path, nb_batch_thres=5, nb_batch_test=100):
+    def test(self, sess, path):
         assert config.mode == 'test'
-        def cal_ff(s, thres):
-            s_thres = s > thres
 
-            far = sum([np.sum(s_thres[i]) - np.sum(s_thres[i, :, i]) for i in range(config.N)]) / \
-                  (config.N - 1) / config.M / config.N
-            frr = sum([config.M - np.sum(s_thres[i][:, i]) for i in range(config.N)]) / config.M / config.N
-            return far, frr
+        self.saver.restore(sess, path) # restore the model
 
-        def gen_batch():
-            enroll_batch, selected_files = random_batch(frames=160)
-            verif_batch, _ = random_batch(selected_files=selected_files, frames=160)
-            return np.concatenate([enroll_batch, verif_batch], axis=1)
+        enroll_batch = get_test_batch()
+        verif_batch = get_test_batch(utter_start = config.M)
+        test_batch = np.concatenate(enroll_batch, verif_batch, axis=1)
 
-        self.saver.restore(sess, path)
+        s = sess.run(self.s_mat, feed_dict={self.batch: test_batch})
+        s = s.reshape([config.N, config.M, -1])
 
-        config.train = True
-        reset_buffer()
-        s_mats = []
-        for i in range(nb_batch_thres):
-            s = sess.run(self.s_mat, feed_dict={self.batch: gen_batch()})
-            s = s.reshape([config.N, config.M, -1])
-            s_mats.append(s)
+        EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
 
+        print("\nEER : %0.2f (thres:%0.2f, FAR:%0.2f, FRR:%0.2f)"%(EER,THRES,EER_FAR,EER_FRR))
+
+    def cal_ff(s, thres):
+        """
+        Cal FAR and FRR
+        """
+        s_thres = s > thres
+
+        far = sum([np.sum(s_thres[i]) - np.sum(s_thres[i, :, i]) for i in range(config.N)]) / \
+              (config.N - 1) / config.M / config.N
+        frr = sum([config.M - np.sum(s_thres[i][:, i]) for i in range(config.N)]) / config.M / config.N
+        return far, frr
+
+    def cal_eer(s):
+        """
+        Calculate EER.
+        """
         diff = math.inf
-        EER = 0
-        THRES = 0
+        EER = 0; THRES = 0; EER_FAR=0; EER_FRR=0
 
         for thres in [0.01 * i + 0.5 for i in range(50)]:
-            fars = []
-            frrs = []
-            for s in s_mats:
-                far, frr = cal_ff(s, thres)
-                fars.append(far)
-                frrs.append(frr)
+            FAR, FRR = cal_ff(s, thres)
 
-            FAR = np.mean(fars)
-            FRR = np.mean(frrs)
             if diff > abs(FAR - FRR):
                 diff = abs(FAR - FRR)
                 THRES = thres
                 EER = (FAR + FRR) / 2.0
-        print('(validation) thres: {}, EER: {}'.format(THRES, EER))
+                EER_FAR = FAT
+                EER_FRR = FRR
 
-        config.train = False
-        reset_buffer()
-        EERS = []
-        for i in range(nb_batch_test):
-            s = sess.run(self.s_mat, feed_dict={self.batch: gen_batch()})
-            s = s.reshape([config.N, config.M, -1])
-
-            far, frr = cal_ff(s, THRES)
-            EERS.append((far + frr) / 2)
-
-        EER = np.mean(EERS)
-        print('(test) EER: {}'.format(EER))
+        return EER, THRES, EER_FAR, EER_FRR
