@@ -7,7 +7,7 @@ from config import *
 from data import wav2spectro
 
 class Buffer:
-    def __init__(self, flush_thres = 20):
+    def __init__(self, flush_thres = 10):
         """
         Param flush_thres: should be greater than 1
         """
@@ -53,7 +53,7 @@ class Buffer:
         do_flush = self.update(npy_list)
         if not do_flush: return
 
-        if config.debug: print('flushing buffer')
+        if config.verbose: print('flushing buffer')
 
         del self.buffer
         gc.collect()

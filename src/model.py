@@ -48,6 +48,15 @@ class Model:
             tf.summary.scalar('loss', self.loss)
             self.merged = tf.summary.merge_all()
 
+            self.batch_valid = tf.placeholder(shape=[None, config.N * config.M * 2, config.mels], dtype=tf.float32)
+            embedded_valid = self.build_model(self.batch_valid) # [2NM, nb_proj]
+            # concatenate [enroll, verif]
+            enroll_embed_valid = normalize(tf.reduce_mean(
+                tf.reshape(embedded_valid[:config.N * config.M, :], shape=[config.N, config.M, -1]), axis=1))
+            verif_embed_valid = embedded_valid[config.N * config.M:, :]
+
+            self.s_valid = similarity(embedded=verif_embed_valid, w=1.0, b=0.0, center=enroll_embed_valid)
+
         elif config.mode == 'test':
             self.batch = tf.placeholder(shape=[None, config.N * config.M * 2, config.mels], dtype=tf.float32)
             embedded = self.build_model(self.batch) # [2NM, nb_proj]
@@ -56,10 +65,10 @@ class Model:
                 tf.reshape(embedded[:config.N * config.M, :], shape=[config.N, config.M, -1]), axis=1))
             verif_embed = embedded[config.N * config.M:, :]
 
-            self.s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, center=enroll_embed) # Shape??
+            self.s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, center=enroll_embed)
 
             if config.verbose:
-                print('Embedded size: ', embedded.shape) # [NM, P]
+                print('Embedded size: ', embedded.shape)
                 print('Similarity matrix size: ', self.s_mat.shape)
         else:
             raise AssertionError("Please check the mode.")
@@ -93,9 +102,17 @@ class Model:
         os.makedirs(model_path, exist_ok=True)
         os.makedirs(log_path, exist_ok=True)
 
+        # Validation dataset
+        enroll_valid_batch = get_test_batch(path = config.valid_path)
+        verif_valid_batch = get_test_batch(path = config.valid_path, utter_start = config.M)
+        valid_batch = np.concatenate((enroll_valid_batch, verif_valid_batch), axis=1)
+
         writer = tf.summary.FileWriter(log_path, sess.graph)
-        lr_factor = 1  ## Decay by half every xx iteration
-        loss_acc = 0   ## accumulate loss in every xx iteration
+        lr_factor = 1  ## Decay by half every n_decay iteration
+        loss_acc = 0   ## accumulate loss in a number of iteration
+
+        best_valid_EER = 1.0
+        best_count = 0
         for i in range(int(config.nb_iters)):
             batch, _ = self.buffer.random_batch()
             _, loss_cur, summary = sess.run([self.train_op, self.loss, self.merged],
@@ -115,8 +132,25 @@ class Model:
                 if config.verbose: print('learning rate is decayed! current lr : ', config.lr * lr_factor)
 
             if (i + 1) % config.save_iters == 0: ## save model (!need to change log to value on validation)
-                self.saver.save(sess, os.path.join(model_path, 'model.ckpt'), global_step=i // config.save_iters)
-                if config.verbose: print('model is saved!')
+                print("Validation...")
+                EER = self.valid(sess, valid_batch)
+                if EER < best_valid_EER:
+                    self.saver.save(sess, os.path.join(model_path, 'model.ckpt'), global_step=best_count)
+                    if config.verbose: print('model is saved!')
+                    best_count += 1
+                    best_valid_EER = EER
+
+
+    def valid(self, sess, valid_batch):
+        assert config.mode == 'train'
+
+        s = sess.run(self.s_mat_valid, feed_dict={self.batch: valid_batch})
+        s = s.reshape([config.N, config.M, -1])
+
+        EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
+
+        print("\nValidation:  EER = %0.4f (thres:%0.2f, FAR:%0.4f, FRR:%0.4f)"%(EER,THRES,EER_FAR,EER_FRR))
+
 
     def test(self, sess, path):
         assert config.mode == 'test'
@@ -132,7 +166,7 @@ class Model:
 
         EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
 
-        print("\nEER : %0.2f (thres:%0.2f, FAR:%0.2f, FRR:%0.2f)"%(EER,THRES,EER_FAR,EER_FRR))
+        print("\nTesting:   EER = %0.4f (thres:%0.2f, FAR:%0.4f, FRR:%0.4f)"%(EER,THRES,EER_FAR,EER_FRR))
 
 def cal_ff(s, thres):
         """
