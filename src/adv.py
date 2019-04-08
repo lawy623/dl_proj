@@ -7,14 +7,14 @@ from config import *
 from data import wav2spectro
 
 class Buffer:
-    def __init__(self, flush_thres = 50):
+    def __init__(self):
         """
         Param flush_thres: should be greater than 1
         """
         if not config.mode == 'train':
             return
 
-        self.flush_thres = flush_thres
+        self.flush_thres = config.flush_thres
         self.K_N = config.K1 * config.N
         self.K_M = config.K2 * config.M
         self.count_down = int( config.K1 * config.K2 * self.flush_thres )
