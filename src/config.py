@@ -33,20 +33,20 @@ config_dict = {
     'loss':'softmax',                                       # loss function to use. 'softmax' or 'contrast'
 
     # Data Buffer. Change based on memory
-    'K1': 2,                                               # times of N that buffer reads in
-    'K2': 5,                                                # times of M that buffer reads in
+    'K1': 10,                                               # times of N that buffer reads in
+    'K2': 3,                                                # times of M that buffer reads in
 
     # Session
     'mode': 'train',                                        # train or test
-    'N': 16,                                                # number of speakers per batch (default 16)
-    'M': 7,                                                 # number of utterances per speaker (default 7)
+    'N': 40,                                                # number of speakers per batch (default 16)
+    'M': 15,                                                 # number of utterances per speaker (default 7)
     'lr': 0.01,                                             # initial learning rate
     'decay': 100000,                                        # num of iterations that lr decay by half
     'optim': ['sgd',                                        # type of the optimizer ('sgd', 'adam', 'rmsprop')
               {'beta1': 0.5, 'beta2': 0.9}],                # additional parameters (for 'adam', 'rmsprop')
     'nb_iters': 1e6,                                        # max iterations
-    'save_iters': 100,                                    # iteration of saving checkpoint
-    'show_loss': 20,                                       # iteration to show the loss.
+    'save_iters': 5000,                                    # iteration of saving checkpoint
+    'show_loss': 100,                                       # iteration to show the loss.
     'verbose': True,                                        # print training detail
 
     # Debug

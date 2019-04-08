@@ -53,7 +53,7 @@ class Model:
             # concatenate [enroll, verif]
             self.enroll_embed = normalize(tf.reduce_mean(
                 tf.reshape(self.embedded[:config.N * config.M, :], shape=[config.N, config.M, -1]), axis=1))
-            self.verif_embed = embedded[config.N * config.M:, :]
+            self.verif_embed = self.embedded[config.N * config.M:, :]
 
             self.s_mat = similarity(embedded=self.verif_embed, w=1.0, b=0.0, center=self.enroll_embed)
 
@@ -123,11 +123,10 @@ class Model:
 
             if (i + 1) % config.save_iters == 0: ## save model (!need to change log to value on validation)
                 print("Validation...")
-                # if False: # not yet implement
                 EER = self.valid(sess, valid_batch)
                 if EER < best_valid_EER:
                     self.saver.save(sess, os.path.join(model_path, 'model.ckpt'), global_step=best_count)
-                    if config.verbose: print('model is saved!')
+                    if config.verbose: print('Model {} is saved! Best Valid EER now:{}'.format(best_count, EER))
                     best_count += 1
                     best_valid_EER = EER
 
@@ -142,12 +141,12 @@ class Model:
 
         s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, center=enroll_embed)
 
-        s = tf.reshape(s_mat, [config.N, config.M, -1])
-
+        s = tf.reshape(s_mat, [config.N, config.M, -1]).eval(session=sess)
+        
         EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
 
         print("\nValidation:  EER = %0.4f (thres:%0.2f, FAR:%0.4f, FRR:%0.4f)"%(EER,THRES,EER_FAR,EER_FRR))
-
+        return EER
 
     def test(self, sess, path):
         assert config.mode == 'test'
@@ -160,7 +159,7 @@ class Model:
 
         s = sess.run(self.s_mat, feed_dict={self.batch: test_batch})
         s = s.reshape([config.N, config.M, -1])
-
+        
         EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
 
         print("\nTesting:   EER = %0.4f (thres:%0.2f, FAR:%0.4f, FRR:%0.4f)"%(EER,THRES,EER_FAR,EER_FRR))
