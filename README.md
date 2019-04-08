@@ -2,6 +2,7 @@
 
 By: Yue Luo(yl4003), Bingqing Wei(bw2581), Gleb Vizitiv(gv2256)
 
+This project is built based on the repository at 'https://github.com/Janghyun1230/Speaker_Verification'
 
 Using Google Cloud for computation.
 To log in the VM, start the vm instance `dl1`, and
