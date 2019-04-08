@@ -119,7 +119,7 @@ class Model:
             _, loss_cur, summary = sess.run([self.train_op, self.loss, self.merged],
                                             feed_dict={self.batch: batch,
                                                        self.lr: config.lr * lr_factor})
-            loss_acc += loss_cur / (config.N * config.M) * 10 ## Norm the loss by dimension.
+            loss_acc += loss_cur # / (config.N * config.M) * 10 ## Norm the loss by dimension.
 
             if i % 10 == 0: # write to tensorboard
                 writer.add_summary(summary, i)
