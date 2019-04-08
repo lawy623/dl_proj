@@ -41,7 +41,6 @@ class Model:
                     grads_rescale.append(g)
             self.train_op = optimizer.apply_gradients(zip(grads_rescale, params), global_step=global_step)
 
-
             variable_count = np.sum(np.array([np.prod(np.array(v.get_shape().as_list())) for v in trainable_vars]))
             if config.verbose: print('Total variables:', variable_count)
 
@@ -143,7 +142,7 @@ class Model:
 
         s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, center=enroll_embed)
 
-        s = s_mat.reshape([config.N, config.M, -1])
+        s = tf.reshape(s_mat, [config.N, config.M, -1])
 
         EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
 
