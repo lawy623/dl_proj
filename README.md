@@ -20,7 +20,7 @@ There is a preprocessed Voxceleb dataset in the BUCKET.
 `$ gsutil cp -r gs://sv-proj/voxceleb . `
 
 ### Prerequisites
-software version/hardware settings we use.
+Software version/hardware settings we use.
 
 - 4 vCPUs, 16 GB RAM
 - 100 GB SSD [check with df -h]
@@ -45,7 +45,16 @@ And
  2. Download the raw dataset. We use [Voxceleb1](http://www.robots.ox.ac.uk/~vgg/data/voxceleb/vox1.html) for this project.
  Go into `./raw_data` and run `$sh get_data_voxceleb.sh`. We only use the training dataset and separate it for our testing. It is about 37GB large.
 
- ### Data Preprocess
- 1. Run `python src/data.py` for data preprocessing.
+### Data Preprocess
+Run `python src/data.py` for data preprocessing.
 
- Some statistics: 1211 speakers. 0.8/0.1/0.1 -> [Train(969)/ Valid(121)/ Test(121)]. Min(nb_utter)=45. Max(nb_utter)=1002.
+Some statistics: 1211 speakers. 0.8/0.1/0.1 -> [Train(969)/ Valid(121)/ Test(121)]. Min(nb_utter)=45. Max(nb_utter)=1002. Not all the data will be use for testing and validation,
+only a partial fixed set will be used.
+
+### Training
+Run `python src/main.py` for training. If you want to specify the location that stores the check point, doing it by `python src/main.py --model_path [MODEL_PATH]`.
+
+
+### Testing
+Run `python src/main.py --mode 'test'` for testing. If you want to specify the location that stores the check point, as well as the checkpoint index,
+doing it by `python src/main.py --mode 'test' --model_path [MODEL_PATH] --iter [idx]`.
