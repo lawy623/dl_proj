@@ -17,7 +17,10 @@ config.model_path = args.model_path
 
 if __name__ == "__main__":
     tf.reset_default_graph()
-    sess = tf.Session()
+    config_tf = tf.ConfigProto()
+    config_tf.gpu_options.allow_growth = True
+    config.gpu_options.per_process_gpu_memory_fraction = 1.0
+    sess = tf.Session(config=config_tf, ...)
     model = Model()
     if config.mode == 'train':
         print("\nTraining Session")
