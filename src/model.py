@@ -48,14 +48,15 @@ class Model:
             tf.summary.scalar('loss', self.loss)
             self.merged = tf.summary.merge_all()
 
-            self.batch_valid = tf.placeholder(shape=[None, config.N * config.M * 2, config.mels], dtype=tf.float32)
-            embedded_valid = self.build_model(self.batch_valid) # [2NM, nb_proj]
-            # concatenate [enroll, verif]
-            enroll_embed_valid = normalize(tf.reduce_mean(
-                tf.reshape(embedded_valid[:config.N * config.M, :], shape=[config.N, config.M, -1]), axis=1))
-            verif_embed_valid = embedded_valid[config.N * config.M:, :]
+            if False: ## Not yet implement. Error for reusing.
+                self.batch_valid = tf.placeholder(shape=[None, config.N * config.M * 2, config.mels], dtype=tf.float32)
+                embedded_valid = self.build_model(self.batch_valid) # [2NM, nb_proj]
+                # concatenate [enroll, verif]
+                enroll_embed_valid = normalize(tf.reduce_mean(
+                    tf.reshape(embedded_valid[:config.N * config.M, :], shape=[config.N, config.M, -1]), axis=1))
+                verif_embed_valid = embedded_valid[config.N * config.M:, :]
 
-            self.s_valid = similarity(embedded=verif_embed_valid, w=1.0, b=0.0, center=enroll_embed_valid)
+                self.s_valid = similarity(embedded=verif_embed_valid, w=1.0, b=0.0, center=enroll_embed_valid)
 
         elif config.mode == 'test':
             self.batch = tf.placeholder(shape=[None, config.N * config.M * 2, config.mels], dtype=tf.float32)
@@ -133,12 +134,13 @@ class Model:
 
             if (i + 1) % config.save_iters == 0: ## save model (!need to change log to value on validation)
                 print("Validation...")
-                EER = self.valid(sess, valid_batch)
-                if EER < best_valid_EER:
-                    self.saver.save(sess, os.path.join(model_path, 'model.ckpt'), global_step=best_count)
-                    if config.verbose: print('model is saved!')
-                    best_count += 1
-                    best_valid_EER = EER
+                if False: # not yet implement
+                    EER = self.valid(sess, valid_batch)
+                    if EER < best_valid_EER:
+                        self.saver.save(sess, os.path.join(model_path, 'model.ckpt'), global_step=best_count)
+                        if config.verbose: print('model is saved!')
+                        best_count += 1
+                        best_valid_EER = EER
 
 
     def valid(self, sess, valid_batch):
