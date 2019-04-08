@@ -33,7 +33,7 @@ config_dict = {
     'loss':'softmax',                                       # loss function to use. 'softmax' or 'contrast'
 
     # Data Buffer. Change based on memory
-    'K1': 20,                                               # times of N that buffer reads in
+    'K1': 2,                                               # times of N that buffer reads in
     'K2': 5,                                                # times of M that buffer reads in
 
     # Session
@@ -45,8 +45,8 @@ config_dict = {
     'optim': ['sgd',                                        # type of the optimizer ('sgd', 'adam', 'rmsprop')
               {'beta1': 0.5, 'beta2': 0.9}],                # additional parameters (for 'adam', 'rmsprop')
     'nb_iters': 1e6,                                        # max iterations
-    'save_iters': 10000,                                    # iteration of saving checkpoint
-    'show_loss': 100,                                       # iteration to show the loss.
+    'save_iters': 100,                                    # iteration of saving checkpoint
+    'show_loss': 20,                                       # iteration to show the loss.
     'verbose': True,                                        # print training detail
 
     # Debug

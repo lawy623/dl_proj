@@ -7,7 +7,7 @@ from config import *
 from data import wav2spectro
 
 class Buffer:
-    def __init__(self, flush_thres = 10):
+    def __init__(self, flush_thres = 100):
         """
         Param flush_thres: should be greater than 1
         """

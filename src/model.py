@@ -20,11 +20,11 @@ class Model:
             self.lr = tf.placeholder(dtype=tf.float32)
             global_step = tf.Variable(0, name='global_step', trainable=False)
 
-            embedded = self.build_model(self.batch) # Get the embedding representation.
-            self.s_mat = similarity(embedded, w, b)
+            self.embedded = self.build_model(self.batch) # Get the embedding representation.
+            self.s_mat = similarity(self.embedded, w, b)
             if config.verbose:
-                print('Embedded size: ', embedded.shape)
-                print('Similarity matrix size: ', s_mat.shape)
+                print('Embedded size: ', self.embedded.shape)
+                print('Similarity matrix size: ', self.s_mat.shape)
             self.loss = loss_cal(self.s_mat, name=config.loss)
 
             # optimization
@@ -48,28 +48,18 @@ class Model:
             tf.summary.scalar('loss', self.loss)
             self.merged = tf.summary.merge_all()
 
-            if False: ## Not yet implement. Error for reusing.
-                self.batch_valid = tf.placeholder(shape=[None, config.N * config.M * 2, config.mels], dtype=tf.float32)
-                embedded_valid = self.build_model(self.batch_valid) # [2NM, nb_proj]
-                # concatenate [enroll, verif]
-                enroll_embed_valid = normalize(tf.reduce_mean(
-                    tf.reshape(embedded_valid[:config.N * config.M, :], shape=[config.N, config.M, -1]), axis=1))
-                verif_embed_valid = embedded_valid[config.N * config.M:, :]
-
-                self.s_valid = similarity(embedded=verif_embed_valid, w=1.0, b=0.0, center=enroll_embed_valid)
-
         elif config.mode == 'test':
             self.batch = tf.placeholder(shape=[None, config.N * config.M * 2, config.mels], dtype=tf.float32)
-            embedded = self.build_model(self.batch) # [2NM, nb_proj]
+            self.embedded = self.build_model(self.batch) # [2NM, nb_proj]
             # concatenate [enroll, verif]
-            enroll_embed = normalize(tf.reduce_mean(
-                tf.reshape(embedded[:config.N * config.M, :], shape=[config.N, config.M, -1]), axis=1))
-            verif_embed = embedded[config.N * config.M:, :]
+            self.enroll_embed = normalize(tf.reduce_mean(
+                tf.reshape(self.embedded[:config.N * config.M, :], shape=[config.N, config.M, -1]), axis=1))
+            self.verif_embed = embedded[config.N * config.M:, :]
 
-            self.s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, center=enroll_embed)
+            self.s_mat = similarity(embedded=self.verif_embed, w=1.0, b=0.0, center=self.enroll_embed)
 
             if config.verbose:
-                print('Embedded size: ', embedded.shape)
+                print('Embedded size: ', self.embedded.shape)
                 print('Similarity matrix size: ', self.s_mat.shape)
         else:
             raise AssertionError("Please check the mode.")
@@ -146,8 +136,14 @@ class Model:
     def valid(self, sess, valid_batch):
         assert config.mode == 'train'
 
-        s = sess.run(self.s_mat, feed_dict={self.batch: valid_batch})
-        s = s.reshape([config.N, config.M, -1])
+        embedded = sess.run(self.embedded, feed_dict={self.batch: valid_batch})
+        enroll_embed = normalize(tf.reduce_mean(
+                tf.reshape(embedded[:config.N * config.M, :], shape=[config.N, config.M, -1]), axis=1))
+        verif_embed = embedded[config.N * config.M:, :]
+
+        s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, center=enroll_embed)
+
+        s = s_mat.reshape([config.N, config.M, -1])
 
         EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
 
