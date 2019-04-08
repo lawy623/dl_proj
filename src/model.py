@@ -14,18 +14,18 @@ class Model:
         """
         if config.mode == 'train':
             self.buffer = Buffer() # Set a global buffer.
-            self.batch = tf.placeholder(shape=[None, config.N * config.M, config.mels], dtype=tf.float32) # First dim is for n_frame
+            self.batch = tf.placeholder(shape=[None, None, config.mels], dtype=tf.float32) # First dim is for n_frame  : config.N * config.M
             w = tf.get_variable('w', initializer=np.array([10], dtype=np.float32))
             b = tf.get_variable('b', initializer=np.array([-5], dtype=np.float32))
             self.lr = tf.placeholder(dtype=tf.float32)
             global_step = tf.Variable(0, name='global_step', trainable=False)
 
             embedded = self.build_model(self.batch) # Get the embedding representation.
-            s_mat = similarity(embedded, w, b)
+            self.s_mat = similarity(embedded, w, b)
             if config.verbose:
                 print('Embedded size: ', embedded.shape)
                 print('Similarity matrix size: ', s_mat.shape)
-            self.loss = loss_cal(s_mat, name=config.loss)
+            self.loss = loss_cal(self.s_mat, name=config.loss)
 
             # optimization
             trainable_vars = tf.trainable_variables()
@@ -134,19 +134,19 @@ class Model:
 
             if (i + 1) % config.save_iters == 0: ## save model (!need to change log to value on validation)
                 print("Validation...")
-                if False: # not yet implement
-                    EER = self.valid(sess, valid_batch)
-                    if EER < best_valid_EER:
-                        self.saver.save(sess, os.path.join(model_path, 'model.ckpt'), global_step=best_count)
-                        if config.verbose: print('model is saved!')
-                        best_count += 1
-                        best_valid_EER = EER
+                # if False: # not yet implement
+                EER = self.valid(sess, valid_batch)
+                if EER < best_valid_EER:
+                    self.saver.save(sess, os.path.join(model_path, 'model.ckpt'), global_step=best_count)
+                    if config.verbose: print('model is saved!')
+                    best_count += 1
+                    best_valid_EER = EER
 
 
     def valid(self, sess, valid_batch):
         assert config.mode == 'train'
 
-        s = sess.run(self.s_mat_valid, feed_dict={self.batch: valid_batch})
+        s = sess.run(self.s_mat, feed_dict={self.batch: valid_batch})
         s = s.reshape([config.N, config.M, -1])
 
         EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
@@ -160,7 +160,7 @@ class Model:
         self.saver.restore(sess, path) # restore the model
 
         enroll_batch = get_test_batch()
-        verif_batch = get_test_batch(utter_start = config.M)
+        verif_batch = get_test_batch(utter_start = config.M) ## Getting same N persons with different M utter.(TI-SV)
         test_batch = np.concatenate((enroll_batch, verif_batch), axis=1)
 
         s = sess.run(self.s_mat, feed_dict={self.batch: test_batch})
