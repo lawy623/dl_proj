@@ -65,8 +65,9 @@ def save_spectrogram(speakers, train_path, valid_path, test_path, test_split, va
     print('Train : {}| Valid : {}| Test : {}'.format(train_speaker_num, valid_speaker_num, test_speaker_num))
 
     # Do some random permutation.
-    permu = np.random.permutation(len(speakers))
-    np.save(os.path.join(work_dir, 'permute.npy'), permu)
+    #permu = np.random.permutation(len(speakers))
+    #np.save(os.path.join(work_dir, 'permute.npy'), permu)
+    permu = np.load(os.path.join(work_dir, 'permute.npy')
 
     for i, idx in enumerate(tqdm(permu)):
         files = speakers[idx]
