@@ -24,7 +24,7 @@ Software version/hardware settings we use.
 
 - 4 vCPUs, 16 GB RAM
 - 300 GB SSD [check with df -h]
-- 1 Nvidia Tesla K80(16GB memory)  [check with nvidia-smi]
+- 1 Nvidia Tesla K80(12GB memory)  [check with nvidia-smi]
 - CUDA v10 [nvcc --version], CUDNN v7 [ls /usr/local/cuda/lib64/ | grep cudnn]
 
 And
