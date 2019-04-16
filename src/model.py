@@ -137,7 +137,7 @@ class Model:
 
         embedded = sess.run(self.embedded, feed_dict={self.batch: valid_batch})
         enroll_embed = normalize(tf.reduce_mean(
-                tf.reshape(embedded[:conlsfig.N * config.M, :], shape=[config.N, config.M, -1]), axis=1))
+                tf.reshape(embedded[:config.N * config.M, :], shape=[config.N, config.M, -1]), axis=1))
         verif_embed = embedded[config.N * config.M:, :]
 
         s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, center=enroll_embed)
