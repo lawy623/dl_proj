@@ -24,7 +24,7 @@ if __name__ == "__main__":
     model = Model()
     if config.mode == 'train':
         print("\nTraining Session")
-        print("Configures:", config)
+        print("Configures:", config.__dict__)
         if os.path.exists(config.model_path):
             shutil.rmtree(config.model_path)
         os.makedirs(config.model_path)
