@@ -70,6 +70,7 @@ class Model:
         Deep learning model to extract the embedding and get the matrix.
         Model1: LSTM
         """
+        print("Model Used: LSTM with projection...")
         with tf.variable_scope('lstm'):
             cells = [tf.contrib.rnn.LSTMCell(num_units=config.nb_hidden, num_proj=config.nb_proj)
                      for i in range(config.nb_layers)]
@@ -94,7 +95,7 @@ class Model:
 
         # Validation dataset
         enroll_valid_batch = get_test_batch(path = config.valid_path)
-        verif_valid_batch = get_test_batch(path = config.valid_path, utter_start = config.M)
+        verif_valid_batch = get_test_batch(path = config.valid_path, enroll = False)
         valid_batch = np.concatenate((enroll_valid_batch, verif_valid_batch), axis=1)
 
         writer = tf.summary.FileWriter(log_path, sess.graph)
@@ -126,7 +127,7 @@ class Model:
                 EER = self.valid(sess, valid_batch)
                 if EER < best_valid_EER:
                     self.saver.save(sess, os.path.join(model_path, 'model.ckpt'), global_step=best_count)
-                    if config.verbose: print('Model {} is saved! Best Valid EER now:{}'.format(best_count, EER))
+                    if config.verbose: print('Model {} is saved at {}! Best Valid EER now:{}'.format(best_count, model_path, EER))
                     best_count += 1
                     best_valid_EER = EER
 
@@ -136,13 +137,13 @@ class Model:
 
         embedded = sess.run(self.embedded, feed_dict={self.batch: valid_batch})
         enroll_embed = normalize(tf.reduce_mean(
-                tf.reshape(embedded[:config.N * config.M, :], shape=[config.N, config.M, -1]), axis=1))
+                tf.reshape(embedded[:conlsfig.N * config.M, :], shape=[config.N, config.M, -1]), axis=1))
         verif_embed = embedded[config.N * config.M:, :]
 
         s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, center=enroll_embed)
 
         s = tf.reshape(s_mat, [config.N, config.M, -1]).eval(session=sess)
-        
+
         EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
 
         print("\nValidation:  EER = %0.4f (thres:%0.2f, FAR:%0.4f, FRR:%0.4f)"%(EER,THRES,EER_FAR,EER_FRR))
@@ -151,15 +152,16 @@ class Model:
     def test(self, sess, path):
         assert config.mode == 'test'
 
+        print("Restoring model from: ", path)
         self.saver.restore(sess, path) # restore the model
 
         enroll_batch = get_test_batch()
-        verif_batch = get_test_batch(utter_start = config.M) ## Getting same N persons with different M utter.(TI-SV)
+        verif_batch = get_test_batch(enroll = False) ## Getting same N persons with different M utter.(TI-SV)
         test_batch = np.concatenate((enroll_batch, verif_batch), axis=1)
 
         s = sess.run(self.s_mat, feed_dict={self.batch: test_batch})
         s = s.reshape([config.N, config.M, -1])
-        
+
         EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
 
         print("\nTesting:   EER = %0.4f (thres:%0.2f, FAR:%0.4f, FRR:%0.4f)"%(EER,THRES,EER_FAR,EER_FRR))
@@ -177,7 +179,7 @@ def cal_ff(s, thres):
 
 def cal_eer(s):
         """
-        Calculate EER.
+        Calculate EER. Iterate all thes to get the one s.t. FAR==FRR.
         """
         diff = math.inf
         EER = 0; THRES = 0; EER_FAR=0; EER_FRR=0

@@ -15,7 +15,7 @@ config_dict = {
     'train_path': os.path.join(work_dir, 'voxceleb', 'train'),     # train dataset directory
     'valid_path': os.path.join(work_dir, 'voxceleb', 'valid'),     # train dataset directory
     'test_path': os.path.join(work_dir, 'voxceleb', 'test'),       # test dataset directory
-    'model_path': os.path.join(work_dir, 'model'),                 # model save paths
+    'model_path': os.path.join(work_dir, 'models', 'model'),                 # model save paths
 
     # Preprocessing
     'sr': 16000,                                            # sample rate
@@ -35,19 +35,24 @@ config_dict = {
     # Data Buffer. Change based on memory
     'K1': 10,                                               # times of N that buffer reads in
     'K2': 3,                                                # times of M that buffer reads in
-    'flush_thres': 25,                                      # Freq to flush the buffer (thres*K1*K2)
+    'flush_thres': 20,                                      # Freq to flush the buffer (thres*K1*K2)
+
     # Session
     'mode': 'train',                                        # train or test
-    'N': 40,                                                # number of speakers per batch (default 16)
+    'N': 30,                                                # number of speakers per batch (default 16)
     'M': 15,                                                 # number of utterances per speaker (default 7)
     'lr': 0.01,                                             # initial learning rate
     'decay': 10000,                                        # num of iterations that lr decay by half
     'optim': ['sgd',                                        # type of the optimizer ('sgd', 'adam', 'rmsprop')
               {'beta1': 0.5, 'beta2': 0.9}],                # additional parameters (for 'adam', 'rmsprop')
     'nb_iters': 1e5,                                        # max iterations
-    'save_iters': 2000,                                    # iteration of saving checkpoint
+    'save_iters': 500,                                    # iteration of saving checkpoint
     'show_loss': 100,                                       # iteration to show the loss.
     'verbose': True,                                        # print training detail
+
+    # Testing Dimension. Need to be fixed for fair comparison
+    'testN': 30,                                             # Fixed Test N
+    'testM': 15,                                             # Fixed Test M
 
     # Debug
     'debug': False,                                          # turn on debug info output
