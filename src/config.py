@@ -46,7 +46,7 @@ config_dict = {
     'optim': ['sgd',                                        # type of the optimizer ('sgd', 'adam', 'rmsprop')
               {'beta1': 0.5, 'beta2': 0.9}],                # additional parameters (for 'adam', 'rmsprop')
     'nb_iters': 1e5,                                        # max iterations
-    'save_iters': 500,                                    # iteration of saving checkpoint
+    'save_iters': 2000,                                    # iteration of saving checkpoint
     'show_loss': 100,                                       # iteration to show the loss.
     'verbose': True,                                        # print training detail
 
