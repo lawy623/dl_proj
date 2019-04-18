@@ -33,8 +33,8 @@ config_dict = {
     'loss':'softmax',                                       # loss function to use. 'softmax' or 'contrast'
 
     # Data Buffer. Change based on memory
-    'K1': 10,                                               # times of N that buffer reads in
-    'K2': 3,                                                # times of M that buffer reads in
+    'K1': 15,                                               # times of N that buffer reads in
+    'K2': 20,                                                # times of M that buffer reads in
     'flush_thres': 10,                                      # Freq to flush the buffer (thres*K1*K2)
 
     # Session
@@ -46,8 +46,8 @@ config_dict = {
     'optim': ['adam',                                        # type of the optimizer ('sgd', 'adam', 'rmsprop')
               {'beta1': 0.9, 'beta2': 0.999}],                # additional parameters (for 'adam', 'rmsprop')
     'nb_iters': 1e5,                                        # max iterations
-    'save_iters': 1000,                                    # iteration of saving checkpoint
-    'show_loss': 100,                                       # iteration to show the loss.
+    'save_iters': 100,                                    # iteration of saving checkpoint
+    'show_loss': 10,                                       # iteration to show the loss.
     'verbose': True,                                        # print training detail
 
     # Testing Dimension. Need to be fixed for fair comparison
