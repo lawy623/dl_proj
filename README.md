@@ -51,7 +51,9 @@ Some statistics: 1211 speakers. 0.8/0.1/0.1 -> [Train(969)/ Valid(121)/ Test(121
 only a partial fixed set will be used.
 
 ### Training
-Run `python src/main.py` for training. If you want to specify the location that stores the check point, doing it by `python src/main.py --model_path [MODEL_PATH]`.
+Run `python src/main.py` for training. If you want to specify the location that stores the check point, doing it by `python src/main.py --model_path [MODEL_PATH]`. [MODEL_PATH] should be a folder name, which will be always under './models/'.
+
+If you want to store the log (which contains training settings and loss), you can do `python -u src/main.py --model_path [MODEL_PATH] | tee train.log`.
 
 
 ### Testing
