@@ -35,7 +35,7 @@ config_dict = {
     # Data Buffer. Change based on memory
     'K1': 10,                                               # times of N that buffer reads in
     'K2': 3,                                                # times of M that buffer reads in
-    'flush_thres': 20,                                      # Freq to flush the buffer (thres*K1*K2)
+    'flush_thres': 10,                                      # Freq to flush the buffer (thres*K1*K2)
 
     # Session
     'mode': 'train',                                        # train or test
@@ -43,10 +43,10 @@ config_dict = {
     'M': 15,                                                 # number of utterances per speaker (default 7)
     'lr': 0.01,                                             # initial learning rate
     'decay': 10000,                                        # num of iterations that lr decay by half
-    'optim': ['sgd',                                        # type of the optimizer ('sgd', 'adam', 'rmsprop')
-              {'beta1': 0.5, 'beta2': 0.9}],                # additional parameters (for 'adam', 'rmsprop')
+    'optim': ['adam',                                        # type of the optimizer ('sgd', 'adam', 'rmsprop')
+              {'beta1': 0.9, 'beta2': 0.999}],                # additional parameters (for 'adam', 'rmsprop')
     'nb_iters': 1e5,                                        # max iterations
-    'save_iters': 2000,                                    # iteration of saving checkpoint
+    'save_iters': 1000,                                    # iteration of saving checkpoint
     'show_loss': 100,                                       # iteration to show the loss.
     'verbose': True,                                        # print training detail
 
