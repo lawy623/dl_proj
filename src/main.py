@@ -24,13 +24,18 @@ if __name__ == "__main__":
     model = Model()
     if config.mode == 'train':
         print("\nTraining Session")
-        print("Configures:", config.__dict__)
+        print("Configures:")
+        for k in config.__dict__:
+            print(k, ":", config.__dict__[k])
+
         if os.path.exists(config.model_path):
             shutil.rmtree(config.model_path)
         os.makedirs(config.model_path)
+
         model.train(sess)
     elif config.mode == 'test':
         print("\nTest Session")
+        
         model_name = 'model.ckpt-' + str(args.iter)
         if os.path.isdir(config.model_path):
             model.test(sess, os.path.join(config.model_path, 'check_point', model_name))
