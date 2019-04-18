@@ -48,12 +48,12 @@ class Model:
             self.merged = tf.summary.merge_all()
 
         elif config.mode == 'test':
-            self.batch = tf.placeholder(shape=[None, config.N * config.M * 2, config.mels], dtype=tf.float32)
-            self.embedded = self.build_model(self.batch) # [2NM, nb_proj]
+            self.batch = tf.placeholder(shape=[None, config.testN * config.testM * 2, config.mels], dtype=tf.float32)
+            self.embedded = self.build_model(self.batch) # [2*testN*testM, nb_proj]
             # concatenate [enroll, verif]
             self.enroll_embed = normalize(tf.reduce_mean(
-                tf.reshape(self.embedded[:config.N * config.M, :], shape=[config.N, config.M, -1]), axis=1))
-            self.verif_embed = self.embedded[config.N * config.M:, :]
+                tf.reshape(self.embedded[:config.testN * config.testM, :], shape=[config.testN, config.testM, -1]), axis=1))
+            self.verif_embed = self.embedded[config.testN * config.testM:, :]
 
             self.s_mat = similarity(embedded=self.verif_embed, w=1.0, b=0.0, center=self.enroll_embed)
 
@@ -137,12 +137,12 @@ class Model:
 
         embedded = sess.run(self.embedded, feed_dict={self.batch: valid_batch})
         enroll_embed = normalize(tf.reduce_mean(
-                tf.reshape(embedded[:config.N * config.M, :], shape=[config.N, config.M, -1]), axis=1))
-        verif_embed = embedded[config.N * config.M:, :]
+                tf.reshape(embedded[:config.testN * config.testM, :], shape=[config.testN, config.testM, -1]), axis=1))
+        verif_embed = embedded[config.testN * config.testM:, :]
 
         s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, center=enroll_embed)
 
-        s = tf.reshape(s_mat, [config.N, config.M, -1]).eval(session=sess)
+        s = tf.reshape(s_mat, [config.testN, config.testM, -1]).eval(session=sess)
 
         EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
 
@@ -160,7 +160,7 @@ class Model:
         test_batch = np.concatenate((enroll_batch, verif_batch), axis=1)
 
         s = sess.run(self.s_mat, feed_dict={self.batch: test_batch})
-        s = s.reshape([config.N, config.M, -1])
+        s = s.reshape([config.testN, config.testM, -1])
 
         EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
 
@@ -172,9 +172,9 @@ def cal_ff(s, thres):
         """
         s_thres = s > thres
 
-        far = sum([np.sum(s_thres[i]) - np.sum(s_thres[i, :, i]) for i in range(config.N)]) / \
-              (config.N - 1) / config.M / config.N
-        frr = sum([config.M - np.sum(s_thres[i][:, i]) for i in range(config.N)]) / config.M / config.N
+        far = sum([np.sum(s_thres[i]) - np.sum(s_thres[i, :, i]) for i in range(config.testN)]) / \
+              (config.testN - 1) / config.testM / config.testN
+        frr = sum([config.testM - np.sum(s_thres[i][:, i]) for i in range(config.testN)]) / config.testM / config.testN
         return far, frr
 
 def cal_eer(s):
