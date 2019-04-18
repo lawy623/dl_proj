@@ -41,7 +41,7 @@ config_dict = {
     'mode': 'train',                                        # train or test
     'N': 30,                                                # number of speakers per batch (default 16)
     'M': 15,                                                 # number of utterances per speaker (default 7)
-    'lr': 0.01,                                             # initial learning rate
+    'lr': 0.001,                                             # initial learning rate
     'decay': 10000,                                        # num of iterations that lr decay by half
     'optim': ['adam',                                        # type of the optimizer ('sgd', 'adam', 'rmsprop')
               {'beta1': 0.9, 'beta2': 0.999}],                # additional parameters (for 'adam', 'rmsprop')
