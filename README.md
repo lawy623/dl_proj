@@ -47,8 +47,9 @@ And
 ### Data Preprocess
 Run `python src/data.py` for data preprocessing.
 
-Some statistics: 1211 speakers. 0.8/0.1/0.1 -> [Train(969)/ Valid(121)/ Test(121)]. Min(nb_utter)=45. Max(nb_utter)=1002. Not all the data will be use for testing and validation,
-only a partial fixed set will be used.
+Some statistics: 1211 speakers. 0.8/0.1/0.1 -> [Train(969)/ Valid(121)/ Test(121)]. Min(nb_utter)=45. Max(nb_utter)=1002. 
+
+Not all the data will be use for testing and validation, only a partial fixed set will be used. For fail comparison, we use test_N = 30(#speaker) and test_M =15(#utter of each speaker) in both validation and testing.
 
 ### Training
 Run `python src/main.py` for training. If you want to specify the location that stores the check point, doing it by `python src/main.py --model_path [MODEL_PATH]`. [MODEL_PATH] should be a folder name, which will be always under './models/'.
@@ -59,3 +60,5 @@ If you want to store the log (which contains training settings and loss), you ca
 ### Testing
 Run `python src/main.py --mode 'test'` for testing. If you want to specify the location that stores the check point, as well as the checkpoint index,
 doing it by `python src/main.py --mode 'test' --model_path [MODEL_PATH] --iter [idx]`.
+
+To keep the log, run `python -u src/main.py --mode 'test' --model_path [MODEL_PATH] --iter [idx] | tee result.txt`.
