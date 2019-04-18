@@ -27,9 +27,9 @@ config_dict = {
     'mels':40,                                              # number of mel banks. That will be the first dim of the np file.
 
     # Model. For LSTM model here.
-    'nb_hidden': 384,                                       # number of hidden units
-    'nb_proj': 128,                                         # number of projection units
-    'nb_layers': 3,                                         # number of LSTM_Projection layers
+    'nb_hidden': 586,                                       # number of hidden units
+    'nb_proj': 256,                                         # number of projection units
+    'nb_layers': 6,                                         # number of LSTM_Projection layers
     'loss':'softmax',                                       # loss function to use. 'softmax' or 'contrast'
 
     # Data Buffer. Change based on memory
