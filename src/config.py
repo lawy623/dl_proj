@@ -31,8 +31,8 @@ config_dict = {
     'nb_proj': 256,                                         # number of projection units
     'nb_layers': 3,                                         # number of LSTM_Projection layers
     'loss':'softmax',                                       # loss function to use. 'softmax' or 'contrast'
-    'use_attention': True,                                  # whether to use attention in the model
-    'use_mean': True,                                       # whether to use mean of the embeddings
+    'use_attention': False,                                  # whether to use attention in the model
+    'use_mean': False,                                       # whether to use mean of the embeddings
     'att_size': 128,                                        # use in attention.
 
     # Data Buffer. Change based on memory

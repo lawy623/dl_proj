@@ -69,8 +69,8 @@ class Model:
         """
         Build the model. Choose one in the options.
         """
-        #return self.build_model_lstm(batch, use_attention = config.use_attention, use_mean = config.use_mean)
-        return self.build_model_bi_lstm(batch, use_attention = config.use_attention, use_mean = config.use_mean)
+        return self.build_model_lstm(batch, use_attention = config.use_attention, use_mean = config.use_mean)
+        #return self.build_model_bi_lstm(batch, use_attention = config.use_attention, use_mean = config.use_mean)
 
     def build_model_lstm(self, batch, use_attention = False, use_mean = True):
         """
