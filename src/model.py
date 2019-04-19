@@ -88,7 +88,7 @@ class Model:
         Model2: Bi-LSTM
         """
         print("Model Used: Bi-LSTM with projection...")
-        with tf.variable_scope('lstm'):
+        with tf.variable_scope('bi-lstm'):
             cells_fw = [tf.contrib.rnn.LSTMCell(num_units=config.nb_hidden, num_proj=config.nb_proj) for i in range(config.nb_layers)]
             lstm_fw = tf.contrib.rnn.MultiRNNCell(cells_fw)
             cells_bw = [tf.contrib.rnn.LSTMCell(num_units=config.nb_hidden, num_proj=config.nb_proj) for i in range(config.nb_layers)]
