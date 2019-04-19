@@ -20,7 +20,7 @@ class Model:
             self.lr = tf.placeholder(dtype=tf.float32)
             global_step = tf.Variable(0, name='global_step', trainable=False)
 
-            self.embedded = self.build_model_bi_lstm(self.batch) # Get the embedding representation.
+            self.embedded = self.build_model(self.batch) # Get the embedding representation.
             self.s_mat = similarity(self.embedded, w, b)
             if config.verbose:
                 print('Embedded size: ', self.embedded.shape)
@@ -49,7 +49,7 @@ class Model:
 
         elif config.mode == 'test':
             self.batch = tf.placeholder(shape=[None, config.testN * config.testM * 2, config.mels], dtype=tf.float32)
-            self.embedded = self.build_model_bi_lstm(self.batch) # [2*testN*testM, nb_proj]
+            self.embedded = self.build_model(self.batch) # [2*testN*testM, nb_proj]
             # concatenate [enroll, verif]
             self.enroll_embed = normalize(tf.reduce_mean(
                 tf.reshape(self.embedded[:config.testN * config.testM, :], shape=[config.testN, config.testM, -1]), axis=1))
@@ -65,10 +65,17 @@ class Model:
 
         self.saver = tf.train.Saver()
 
-    def build_model_lstm(self, batch):
+    def build_model(self, batch):
+        """
+        Build the model. Choose one in the options.
+        """
+        #self.build_model_lstm(batch, attention = config.use_attention, use_mean = config.use_mean)
+        self.build_model_bi_lstm(batch, attention = config.use_attention, use_mean = config.use_mean)
+
+    def build_model_lstm(self, batch, attention = False):
         """
         Deep learning model to extract the embedding and get the matrix.
-        Model1: LSTM
+        Model1: LSTM. 'attention' to choose whether to use attention.
         """
         print("Model Used: LSTM with projection...")
         with tf.variable_scope('lstm'):
@@ -76,16 +83,30 @@ class Model:
                      for i in range(config.nb_layers)]
             lstm = tf.contrib.rnn.MultiRNNCell(cells)
             outputs, _ = tf.nn.dynamic_rnn(cell=lstm, inputs=batch, dtype=tf.float32, time_major=True)
-            embedded = outputs[-1]
+            if attention: # Use attention. final embedding is the weighted sum of all step's embedding.
+                print("Use Attention in LSTM...")
+                w_att = tf.Variable(tf.random.normal([config.nb_proj, config.att_size], stddev=0.1))
+                b_att = tf.Variable(tf.random.normal([config.att_size], stddev=0.1))
+                u_att = tf.Variable(tf.random.normal([config.att_size], stddev=0.1))
+                v = tf.tanh(tf.tensordot(outputs, w_att, axes=1) + b_att)
+                vu = tf.tensordot(v, u_att, axes=1)
+                alphas = tf.nn.softmax(vu, axis=0, name='alphas')
+                alphas = tf.expand_dims(tf.transpose(alphas, perm=[1,0]), -1)
+                embedded = tf.reduce_sum(tf.transpose(outputs, perm = [1,0,2]) * alphas, 1)
+            else:
+                if use_mean:
+                    embedded = tf.reduce_mean(outputs, axis=0)
+                else:
+                    embedded = outputs[-1]
 
             # shape = (N * M, nb_proj). Each e_ji is in (nb_proj,) dimension.
             embedded = normalize(embedded)
         return embedded
 
-    def build_model_bi_lstm(self, batch):
+    def build_model_bi_lstm(self, batch, attention = False, use_mean = True):
         """
         Deep learning model to extract the embedding and get the matrix.
-        Model2: Bi-LSTM
+        Model2: Bi-LSTM. 'attention' to choose whether to use attention. 'use_mean' indicates whether to use the avg of embedding at all time steps.
         """
         print("Model Used: Bi-LSTM with projection...")
         with tf.variable_scope('bi-lstm'):
@@ -94,9 +115,24 @@ class Model:
             cells_bw = [tf.contrib.rnn.LSTMCell(num_units=config.nb_hidden, num_proj=config.nb_proj) for i in range(config.nb_layers)]
             lstm_bw = tf.contrib.rnn.MultiRNNCell(cells_bw)
             outputs, _ = tf.nn.bidirectional_dynamic_rnn(cell_fw=lstm_fw, cell_bw=lstm_bw, inputs=batch, dtype=tf.float32, time_major=True)
-            embedded = tf.math.add(outputs[0][-1],outputs[1][0]) / 2.0
+            outputs = tf.concat(outputs, 2)
+            if attention: # Use attention. final embedding is the weighted sum of all step's embedding.
+                print("Use Attention in LSTM...")
+                w_att = tf.Variable(tf.random.normal([config.nb_proj*2, config.att_size*2], stddev=0.1))
+                b_att = tf.Variable(tf.random.normal([config.att_size*2], stddev=0.1))
+                u_att = tf.Variable(tf.random.normal([config.att_size*2], stddev=0.1))
+                v = tf.tanh(tf.tensordot(outputs, w_att, axes=1) + b_att)
+                vu = tf.tensordot(v, u_att, axes=1)
+                alphas = tf.nn.softmax(vu, axis=0, name='alphas')
+                alphas = tf.expand_dims(tf.transpose(alphas, perm=[1,0]), -1)
+                embedded = tf.reduce_sum(tf.transpose(outputs, perm = [1,0,2]) * alphas, 1)
+            else:
+                if use_mean:
+                    embedded = tf.reduce_mean(outputs, axis=0)
+                else:
+                    embedded = tf.math.add(outputs[0,:,:],outputs[-1,:,:]) / 2.0
 
-            # shape = (N * M, nb_proj). Each e_ji is in (nb_proj,) dimension.
+            # shape = (N * M, nb_proj*2) due to combine embeddings. Each e_ji is in (nb_proj*2,) dimension.
             embedded = normalize(embedded)
         return embedded
 
