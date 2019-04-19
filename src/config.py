@@ -54,8 +54,8 @@ config_dict = {
     'verbose': True,                                        # print training detail
 
     # Testing Dimension. Need to be fixed for fair comparison
-    'testN': 30,                                             # Fixed Test N
-    'testM': 15,                                             # Fixed Test M
+    'testN': 10,                                             # Fixed Test N
+    'testM': 5,                                             # Fixed Test M
 
     # Debug
     'debug': False,                                          # turn on debug info output
