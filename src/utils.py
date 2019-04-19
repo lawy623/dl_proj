@@ -22,7 +22,7 @@ def similarity(embedded, w, b, N=config.N, M=config.M, center=None):
     if center is None:
         # normalize the center in order to do easy cosin calculation.
         center = normalize(tf.reduce_mean(embedded_split, axis=1)) #[N, P]
-        center_except = normalize(tf.reshape(tf.reduce_sum(embedded_split, axis=1, keepdims=True) - embedded_split, shape=[N * M, P]) / (M - 1)) #[NM, P]
+        center_except = normalize(tf.reshape(tf.reduce_sum(embedded_split, axis=1, keepdims=True) - embedded_split, shape=[N * M, -1]) / (M - 1)) #[NM, P]
 
         # shape = (N * M, N)
         S = tf.concat(
