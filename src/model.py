@@ -69,10 +69,10 @@ class Model:
         """
         Build the model. Choose one in the options.
         """
-        #return self.build_model_lstm(batch, attention = config.use_attention, use_mean = config.use_mean)
+        #return self.build_model_lstm(batch, use_attention = config.use_attention, use_mean = config.use_mean)
         return self.build_model_bi_lstm(batch, use_attention = config.use_attention, use_mean = config.use_mean)
 
-    def build_model_lstm(self, batch, use_attention = False):
+    def build_model_lstm(self, batch, use_attention = False, use_mean = True):
         """
         Deep learning model to extract the embedding and get the matrix.
         Model1: LSTM. 'attention' to choose whether to use attention.
