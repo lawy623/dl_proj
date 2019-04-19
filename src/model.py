@@ -20,7 +20,7 @@ class Model:
             self.lr = tf.placeholder(dtype=tf.float32)
             global_step = tf.Variable(0, name='global_step', trainable=False)
 
-            self.embedded = self.build_model(self.batch) # Get the embedding representation.
+            self.embedded = self.build_model_bi_lstm(self.batch) # Get the embedding representation.
             self.s_mat = similarity(self.embedded, w, b)
             if config.verbose:
                 print('Embedded size: ', self.embedded.shape)
@@ -49,7 +49,7 @@ class Model:
 
         elif config.mode == 'test':
             self.batch = tf.placeholder(shape=[None, config.testN * config.testM * 2, config.mels], dtype=tf.float32)
-            self.embedded = self.build_model(self.batch) # [2*testN*testM, nb_proj]
+            self.embedded = self.build_model_bi_lstm(self.batch) # [2*testN*testM, nb_proj]
             # concatenate [enroll, verif]
             self.enroll_embed = normalize(tf.reduce_mean(
                 tf.reshape(self.embedded[:config.testN * config.testM, :], shape=[config.testN, config.testM, -1]), axis=1))
@@ -65,7 +65,7 @@ class Model:
 
         self.saver = tf.train.Saver()
 
-    def build_model(self, batch):
+    def build_model_lstm(self, batch):
         """
         Deep learning model to extract the embedding and get the matrix.
         Model1: LSTM
@@ -77,6 +77,24 @@ class Model:
             lstm = tf.contrib.rnn.MultiRNNCell(cells)
             outputs, _ = tf.nn.dynamic_rnn(cell=lstm, inputs=batch, dtype=tf.float32, time_major=True)
             embedded = outputs[-1]
+
+            # shape = (N * M, nb_proj). Each e_ji is in (nb_proj,) dimension.
+            embedded = normalize(embedded)
+        return embedded
+
+    def build_model_bi_lstm(self, batch):
+        """
+        Deep learning model to extract the embedding and get the matrix.
+        Model2: Bi-LSTM
+        """
+        print("Model Used: Bi-LSTM with projection...")
+        with tf.variable_scope('lstm'):
+            cells_fw = [tf.contrib.rnn.LSTMCell(num_units=nb_hidden, num_proj=nb_proj) for i in range(nb_layer)]
+            lstm_fw = tf.contrib.rnn.MultiRNNCell(cells_fw)
+            cells_bw = [tf.contrib.rnn.LSTMCell(num_units=nb_hidden, num_proj=nb_proj) for i in range(nb_layer)]
+            lstm_bw = tf.contrib.rnn.MultiRNNCell(cells_bw)
+            outputs, _ = tf.nn.bidirectional_dynamic_rnn(cell_fw=lstm_fw, cell_bw=lstm_bw, inputs=batch, dtype=tf.float32, time_major=True)
+            embedded = tf.math.add(outputs[0][-1],outputs[1][0]) / 2.0
 
             # shape = (N * M, nb_proj). Each e_ji is in (nb_proj,) dimension.
             embedded = normalize(embedded)
