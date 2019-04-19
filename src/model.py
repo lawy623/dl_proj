@@ -69,10 +69,10 @@ class Model:
         """
         Build the model. Choose one in the options.
         """
-        #self.build_model_lstm(batch, attention = config.use_attention, use_mean = config.use_mean)
-        self.build_model_bi_lstm(batch, attention = config.use_attention, use_mean = config.use_mean)
+        #return self.build_model_lstm(batch, attention = config.use_attention, use_mean = config.use_mean)
+        return self.build_model_bi_lstm(batch, use_attention = config.use_attention, use_mean = config.use_mean)
 
-    def build_model_lstm(self, batch, attention = False):
+    def build_model_lstm(self, batch, use_attention = False):
         """
         Deep learning model to extract the embedding and get the matrix.
         Model1: LSTM. 'attention' to choose whether to use attention.
@@ -83,7 +83,7 @@ class Model:
                      for i in range(config.nb_layers)]
             lstm = tf.contrib.rnn.MultiRNNCell(cells)
             outputs, _ = tf.nn.dynamic_rnn(cell=lstm, inputs=batch, dtype=tf.float32, time_major=True)
-            if attention: # Use attention. final embedding is the weighted sum of all step's embedding.
+            if use_attention: # Use attention. final embedding is the weighted sum of all step's embedding.
                 print("Use Attention in LSTM...")
                 w_att = tf.Variable(tf.random.normal([config.nb_proj, config.att_size], stddev=0.1))
                 b_att = tf.Variable(tf.random.normal([config.att_size], stddev=0.1))
@@ -103,7 +103,7 @@ class Model:
             embedded = normalize(embedded)
         return embedded
 
-    def build_model_bi_lstm(self, batch, attention = False, use_mean = True):
+    def build_model_bi_lstm(self, batch, use_attention = False, use_mean = True):
         """
         Deep learning model to extract the embedding and get the matrix.
         Model2: Bi-LSTM. 'attention' to choose whether to use attention. 'use_mean' indicates whether to use the avg of embedding at all time steps.
@@ -116,7 +116,7 @@ class Model:
             lstm_bw = tf.contrib.rnn.MultiRNNCell(cells_bw)
             outputs, _ = tf.nn.bidirectional_dynamic_rnn(cell_fw=lstm_fw, cell_bw=lstm_bw, inputs=batch, dtype=tf.float32, time_major=True)
             outputs = tf.concat(outputs, 2)
-            if attention: # Use attention. final embedding is the weighted sum of all step's embedding.
+            if use_attention: # Use attention. final embedding is the weighted sum of all step's embedding.
                 print("Use Attention in LSTM...")
                 w_att = tf.Variable(tf.random.normal([config.nb_proj*2, config.att_size*2], stddev=0.1))
                 b_att = tf.Variable(tf.random.normal([config.att_size*2], stddev=0.1))
