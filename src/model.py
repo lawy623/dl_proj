@@ -55,7 +55,7 @@ class Model:
                 tf.reshape(self.embedded[:config.testN * config.testM, :], shape=[config.testN, config.testM, -1]), axis=1))
             self.verif_embed = self.embedded[config.testN * config.testM:, :]
 
-            self.s_mat = similarity(embedded=self.verif_embed, w=1.0, b=0.0, center=self.enroll_embed)
+            self.s_mat = similarity(embedded=self.verif_embed, w=1.0, b=0.0, , N=config.testN, M=config.testM, center=self.enroll_embed)
 
             if config.verbose:
                 print('Embedded size: ', self.embedded.shape)
@@ -194,7 +194,7 @@ class Model:
                 tf.reshape(embedded[:config.testN * config.testM, :], shape=[config.testN, config.testM, -1]), axis=1))
         verif_embed = embedded[config.testN * config.testM:, :]
 
-        s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, center=enroll_embed)
+        s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, N=config.testN, M=config.testM, center=enroll_embed)
 
         s = sess.run(tf.reshape(s_mat, [config.testN, config.testM, -1]))
         loss = sess.run(loss_cal(s_mat, name=config.loss, N=config.testN, M=config.testM))
