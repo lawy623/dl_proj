@@ -196,12 +196,12 @@ class Model:
 
         s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, center=enroll_embed)
 
-        s = tf.reshape(s_mat, [config.testN, config.testM, -1]).eval(session=sess)
-
-        loss = loss_cal(s, name=config.loss, N=testN, M=testM)
+        s = sess.run(tf.reshape(s_mat, [config.testN, config.testM, -1]))
+        loss = sess.run(loss_cal(s, name=config.loss, N=config.testN, M=config.testM))
         EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
 
-        print("\nValidation:  EER = %0.4f (thres:%0.2f, FAR:%0.4f, FRR:%0.4f).   Loss:%0.4f"%(EER,THRES,EER_FAR,EER_FRR,loss))
+        print("Validation:  EER = %0.4f (thres:%0.2f, FAR:%0.4f, FRR:%0.4f)."%(EER,THRES,EER_FAR,EER_FRR))
+        print("Valid Loss:", loss)
         return EER
 
     def test(self, sess, path):
