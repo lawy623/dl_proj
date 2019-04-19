@@ -89,9 +89,9 @@ class Model:
         """
         print("Model Used: Bi-LSTM with projection...")
         with tf.variable_scope('lstm'):
-            cells_fw = [tf.contrib.rnn.LSTMCell(num_units=nb_hidden, num_proj=nb_proj) for i in range(nb_layer)]
+            cells_fw = [tf.contrib.rnn.LSTMCell(num_units=config.nb_hidden, num_proj=config.nb_proj) for i in range(config.nb_layer)]
             lstm_fw = tf.contrib.rnn.MultiRNNCell(cells_fw)
-            cells_bw = [tf.contrib.rnn.LSTMCell(num_units=nb_hidden, num_proj=nb_proj) for i in range(nb_layer)]
+            cells_bw = [tf.contrib.rnn.LSTMCell(num_units=config.nb_hidden, num_proj=config.nb_proj) for i in range(config.nb_layer)]
             lstm_bw = tf.contrib.rnn.MultiRNNCell(cells_bw)
             outputs, _ = tf.nn.bidirectional_dynamic_rnn(cell_fw=lstm_fw, cell_bw=lstm_bw, inputs=batch, dtype=tf.float32, time_major=True)
             embedded = tf.math.add(outputs[0][-1],outputs[1][0]) / 2.0
