@@ -16,8 +16,8 @@ def cossim(x, y, normalized=True):
         return tf.reduce_sum(x * y) / x_norm / y_norm
 
 
-def similarity(embedded, w, b, N=config.N, M=config.M, P=config.nb_proj, center=None):
-    embedded_split = tf.reshape(embedded, shape=[N, M, P])
+def similarity(embedded, w, b, N=config.N, M=config.M, center=None):
+    embedded_split = tf.reshape(embedded, shape=[N, M, -1])
 
     if center is None:
         # normalize the center in order to do easy cosin calculation.
