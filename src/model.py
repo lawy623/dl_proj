@@ -198,7 +198,7 @@ class Model:
 
         s = tf.reshape(s_mat, [config.testN, config.testM, -1]).eval(session=sess)
 
-        loss = loss_cal(s, name=config.loss)
+        loss = loss_cal(s, name=config.loss, N=testN, M=testM)
         EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
 
         print("\nValidation:  EER = %0.4f (thres:%0.2f, FAR:%0.4f, FRR:%0.4f).   Loss:%0.4f"%(EER,THRES,EER_FAR,EER_FRR,loss))
