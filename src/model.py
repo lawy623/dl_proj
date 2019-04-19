@@ -197,7 +197,7 @@ class Model:
         s_mat = similarity(embedded=verif_embed, w=1.0, b=0.0, center=enroll_embed)
 
         s = sess.run(tf.reshape(s_mat, [config.testN, config.testM, -1]))
-        loss = sess.run(loss_cal(s, name=config.loss, N=config.testN, M=config.testM))
+        loss = sess.run(loss_cal(s_mat, name=config.loss, N=config.testN, M=config.testM))
         EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
 
         print("Validation:  EER = %0.4f (thres:%0.2f, FAR:%0.4f, FRR:%0.4f)."%(EER,THRES,EER_FAR,EER_FRR))
