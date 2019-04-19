@@ -215,11 +215,13 @@ class Model:
         test_batch = np.concatenate((enroll_batch, verif_batch), axis=1)
 
         s = sess.run(self.s_mat, feed_dict={self.batch: test_batch})
+        loss = sess.run(loss_cal(s, name=config.loss, N=config.testN, M=config.testM))
         s = s.reshape([config.testN, config.testM, -1])
 
         EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
 
         print("\nTesting:   EER = %0.4f (thres:%0.2f, FAR:%0.4f, FRR:%0.4f)"%(EER,THRES,EER_FAR,EER_FRR))
+        print("Test Loss:", loss)
 
 def cal_ff(s, thres):
         """
