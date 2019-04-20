@@ -21,7 +21,7 @@ class Model:
             global_step = tf.Variable(0, name='global_step', trainable=False)
 
             self.embedded = self.build_model(self.batch) # Get the embedding representation.
-            self.s_mat = similarity(self.embedded, w, b)
+            self.s_mat = similarity(self.embedded, self.w, self.b)
             if config.verbose:
                 print('Embedded size: ', self.embedded.shape)
                 print('Similarity matrix size: ', self.s_mat.shape)
