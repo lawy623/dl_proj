@@ -15,8 +15,8 @@ class Model:
         if config.mode == 'train':
             self.buffer = Buffer() # Set a global buffer.
             self.batch = tf.placeholder(shape=[None, None, config.mels], dtype=tf.float32) # First dim is for n_frame  : config.N * config.M
-            w = tf.get_variable('w', initializer=np.array([10], dtype=np.float32))
-            b = tf.get_variable('b', initializer=np.array([-5], dtype=np.float32))
+            self.w = tf.get_variable('w', initializer=np.array([10], dtype=np.float32))
+            self.b = tf.get_variable('b', initializer=np.array([-5], dtype=np.float32))
             self.lr = tf.placeholder(dtype=tf.float32)
             global_step = tf.Variable(0, name='global_step', trainable=False)
 
@@ -169,7 +169,9 @@ class Model:
                 writer.add_summary(summary, i)
 
             if (i + 1) % config.show_loss == 0: # print acc loss
-                if config.verbose: print('(iter : %d) loss: %.4f' % ((i + 1), loss_acc / config.show_loss))
+                s = sess.run( (tf.reshape(self.s_mat, [config.N, config.M, -1]) - self.b) / tf.abs(self.w) )
+                EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
+                if config.verbose: print('(iter : %d) loss: %.6f. | EER = %0.4f (thres:%0.2f, FAR:%0.4f, FRR:%0.4f).' % ((i + 1), loss_acc / (config.show_loss*config.N*config.M), EER,THRES,EER_FAR,EER_FRR) )
                 loss_acc = 0
 
             if (i + 1) % config.decay == 0:  # decay lr by half.
@@ -201,7 +203,7 @@ class Model:
         EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
 
         print("Validation:  EER = %0.4f (thres:%0.2f, FAR:%0.4f, FRR:%0.4f)."%(EER,THRES,EER_FAR,EER_FRR))
-        print("Valid Loss:", loss)
+        print('Valid Loss: %.6f.' % ( loss/(config.testN*config.testM) ))
         return EER
 
     def test(self, sess, path):
@@ -221,7 +223,7 @@ class Model:
         EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
 
         print("\nTesting:   EER = %0.4f (thres:%0.2f, FAR:%0.4f, FRR:%0.4f)"%(EER,THRES,EER_FAR,EER_FRR))
-        print("Test Loss:", loss)
+        print('Test Loss: %.6f. ' % ( loss/(config.testN*config.testM) ))
 
 def cal_ff(s, thres):
         """
