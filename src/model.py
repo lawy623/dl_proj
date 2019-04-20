@@ -148,8 +148,8 @@ class Model:
         os.makedirs(log_path, exist_ok=True)
 
         # Validation dataset
-        enroll_valid_batch = get_test_batch(path = config.valid_path)
-        verif_valid_batch = get_test_batch(path = config.valid_path, enroll = False)
+        enroll_valid_batch = get_test_batch(speaker_num = config.validN, utter_num = config.validM, path = config.valid_path)
+        verif_valid_batch = get_test_batch(speaker_num = config.validN, utter_num = config.validM, path = config.valid_path, enroll = False)
         valid_batch = np.concatenate((enroll_valid_batch, verif_valid_batch), axis=1)
 
         writer = tf.summary.FileWriter(log_path, sess.graph)
@@ -163,7 +163,7 @@ class Model:
             _, s_mat, loss_cur, summary = sess.run([self.train_op, self.s_mat, self.loss, self.merged],
                                             feed_dict={self.batch: batch,
                                                        self.lr: config.lr * lr_factor})
-            loss_acc += loss_cur # / (config.N * config.M) * 10 ## Norm the loss by dimension.
+            loss_acc += loss_cur / (config.N * config.M) ## Norm the loss by dimension.
 
             if i % 10 == 0: # write to tensorboard
                 writer.add_summary(summary, i)
@@ -171,7 +171,7 @@ class Model:
             if (i + 1) % config.show_loss == 0: # print acc loss
                 s = sess.run( (tf.reshape(s_mat, [config.N, config.M, -1]) - self.b) / tf.abs(self.w) )
                 EER, THRES, EER_FAR, EER_FRR = cal_eer(s)
-                if config.verbose: print('(iter : %d) loss: %.6f. | EER = %0.4f (thres:%0.2f, FAR:%0.4f, FRR:%0.4f).' % ((i + 1), loss_acc / (config.show_loss*config.N*config.M), EER,THRES,EER_FAR,EER_FRR) )
+                if config.verbose: print('(iter : %d) loss: %.6f. | EER = %0.4f (thres:%0.2f, FAR:%0.4f, FRR:%0.4f).' % ((i + 1), loss_acc / config.show_loss, EER,THRES,EER_FAR,EER_FRR) )
                 loss_acc = 0
 
             if (i + 1) % config.decay == 0:  # decay lr by half.
@@ -243,7 +243,7 @@ def cal_eer(s):
         diff = math.inf
         EER = 0; THRES = 0; EER_FAR=0; EER_FRR=0
 
-        for thres in [0.01 * i + 0.5 for i in range(50)]:
+        for thres in [0.01 * i for i in range(100)]:
             FAR, FRR = cal_ff(s, thres)
 
             if diff > abs(FAR - FRR):
